@@ -1,0 +1,7 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+192.168.219.162       kubmaster01
+192.168.162.116       kubnode01
+192.168.198.159       kubnode02
+192.168.214.144       kubvol01
