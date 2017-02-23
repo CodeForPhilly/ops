@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-authkeys_src='../kubernetes/alpha-cluster/authorized_keys'
+authkeys_src='$(git rev-parse --show-toplevel)/kubernetes/alpha-cluster/authorized_keys'
 authkeys_dst='/root/.ssh/authorized_keys'
 
 test -e $authkeys_src
