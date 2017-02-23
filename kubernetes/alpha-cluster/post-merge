@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+cron_src="$(git rev-parse --show-toplevel)/pull-self.sh"
+cron_dst='/etc/cron.hourly/pull-self.sh'
+
 src_base="$(git rev-parse --show-toplevel)/kubernetes/alpha-cluster"
 authkeys_src="$src_base/authorized_keys"
 authkeys_dst='/root/.ssh/authorized_keys'
@@ -23,4 +26,9 @@ fi
 if ! [ "$(readlink -f $hosts_dst)" = $hosts_src ]; then
   rm -f $hosts_dst
   ln -s $hosts_src $hosts_dst
+fi
+
+if ! [ "$(readlink -f $cron_src)" = $cron_dst]; then
+  rm -f $cron_dst
+  ln -s $cron_src $cron_dst
 fi
