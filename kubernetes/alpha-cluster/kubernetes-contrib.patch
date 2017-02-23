@@ -1,0 +1,27 @@
+diff --git a/ansible/inventory/group_vars/all.yml b/ansible/inventory/group_vars/all.yml
+index df4ccbd4..4ee8d9b2 100644
+--- a/ansible/inventory/group_vars/all.yml
++++ b/ansible/inventory/group_vars/all.yml
+@@ -23,6 +23,7 @@ cluster_name: cluster.local
+ # the managed machines. The user must be able to use sudo without asking
+ # for password unless ansible_sudo_pass is set
+ #ansible_ssh_user: root
++ansible_ssh_user: root
+ 
+ # password for the ansible_ssh_user. If this is unset you will need to set up
+ # ssh keys so a password is not needed.
+diff --git a/ansible/inventory/inventory b/ansible/inventory/inventory
+new file mode 100644
+index 00000000..01779abe
+--- /dev/null
++++ b/ansible/inventory/inventory
+@@ -0,0 +1,9 @@
++[masters]
++kubmaster01
++
++[etcd]
++kubmaster01
++
++[nodes]
++kubnode01
++kubnode02
