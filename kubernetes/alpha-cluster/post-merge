@@ -1,10 +1,15 @@
 #!/bin/sh
 set -e
 
-authkeys_src="$(git rev-parse --show-toplevel)/kubernetes/alpha-cluster/authorized_keys"
+src_base="$(git rev-parse --show-toplevel)/kubernetes/alpha-cluster"
+authkeys_src="$src_base/authorized_keys"
 authkeys_dst='/root/.ssh/authorized_keys'
+hosts_src="$src_base/hosts"
+hosts_dst='/etc/hosts'
 
+test $(id -u) -eq 0
 test -e $authkeys_src
+test -e $hosts_src
 
 if ! [ "$(stat -c %a $authkeys_src)" = '600' ]; then
   chmod 0600 $authkeys_src
@@ -13,4 +18,9 @@ fi
 if ! [ $(find $(dirname $authkeys_dst) -samefile $authkeys_src | wc -l) -gt 0 ]; then
   rm -f $authkeys_dst
   ln $authkeys_src $authkeys_dst
+fi
+
+if ! [ "$(readlink -f $hosts_dst)" = $hosts_src ]; then
+  rm -f $hosts_dst
+  ln -s $hosts_src $hosts_dst
 fi
