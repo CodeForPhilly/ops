@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+authkeys_src='../kubernetes/alpha-cluster/authorized_keys'
+authkeys_dst='/root/.ssh/authorized_keys'
+
+test -e $authkeys_src
+
+if ! [ "$(stat -c %a $authkeys_src)" = '600' ]; then
+  chmod 0600 $authkeys_src
+fi
+
+if ! [ $(find $(dirname $authkeys_dst) -samefile $authkeys_src | wc -l) -gt 0 ]; then
+  rm -f $authkeys_dst
+  ln $authkeys_src $authkeys_dst
+fi
