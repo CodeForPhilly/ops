@@ -28,7 +28,7 @@ if ! [ "$(readlink -f $hosts_dst)" = $hosts_src ]; then
   ln -s $hosts_src $hosts_dst
 fi
 
-if ! [ "$(readlink -f $cron_src)" = $cron_dst]; then
+if ! [ "$(readlink -f $cron_src)" = $cron_dst ]; then
   rm -f $cron_dst
   ln -s $cron_src $cron_dst
 fi
