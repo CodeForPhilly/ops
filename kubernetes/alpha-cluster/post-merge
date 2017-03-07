@@ -11,12 +11,15 @@ authkeys_src=$src_base/authorized_keys
 authkeys_dst=/root/.ssh/authorized_keys
 hosts_src=$src_base/hosts
 hosts_dst=/etc/hosts
+dockercfg_src=$src_base/sysconfig-docker
+dockercfg_dst=/etc/sysconfig/docker
 
 test $(id -u) -eq 0
 test -e $(dirname $self_dst)
 test -e $authkeys_src
 test -e $hosts_src
 test -e $cron_src
+test -e $dockercfg_src
 
 if ! [ -e $self_dst ] || ! [ "$(readlink -f $self_dst)" = $self_src  ]; then
   rm -f $self_dst
@@ -40,4 +43,9 @@ fi
 if ! [ "$(readlink -f $cron_dst)" = $cron_src ]; then
   rm -f $cron_dst
   ln -s $cron_src $cron_dst
+fi
+
+if [ -e $dockercfg_dst ] && ! [ "$(readlink -f $dockercfg_dst)" = $dockercfg_src  ]; then
+  rm -f $dockercfg_dst
+  ln -s $dockercfg_src $dockercfg_dst
 fi
