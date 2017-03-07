@@ -45,7 +45,11 @@ if ! [ "$(readlink -f $cron_dst)" = $cron_src ]; then
   ln -s $cron_src $cron_dst
 fi
 
-if [ -e $dockercfg_dst ] && ! [ "$(readlink -f $dockercfg_dst)" = $dockercfg_src  ]; then
-  rm -f $dockercfg_dst
-  ln -s $dockercfg_src $dockercfg_dst
+# We want this config in place *before* docker is installed,
+# but we don't want to emplace it on systems without /etc/sysconfig
+if [ -e $(dirname $dockercfg_dst) ]; then
+  if ! [ -e $dockercfg_dst ] || ! [ "$(readlink -f $dockercfg_dst)" = $dockercfg_src  ]; then
+    rm -f $dockercfg_dst
+    ln -s $dockercfg_src $dockercfg_dst
+  fi
 fi
