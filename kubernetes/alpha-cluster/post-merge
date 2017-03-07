@@ -5,15 +5,23 @@ cron_src=$(git rev-parse --show-toplevel)/pull-self.sh
 cron_dst=/etc/cron.hourly/pull-self.sh
 
 src_base=$(git rev-parse --show-toplevel)/kubernetes/alpha-cluster
+self_src=$src_base/post-merge
+self_dst=$(git rev-parse --show-toplevel)/.git/hooks/post-merge
 authkeys_src=$src_base/authorized_keys
 authkeys_dst=/root/.ssh/authorized_keys
 hosts_src=$src_base/hosts
 hosts_dst=/etc/hosts
 
 test $(id -u) -eq 0
+test -e $(dirname $self_dst)
 test -e $authkeys_src
 test -e $hosts_src
 test -e $cron_src
+
+if ! [ -e $self_dst ] || ! [ "$(readlink -f $self_dst)" = $self_src  ]; then
+  rm -f $self_dst
+  ln -s $self_src $self_dst
+fi
 
 if ! [ "$(stat -c %a $authkeys_src)" = '600' ]; then
   chmod 0600 $authkeys_src
