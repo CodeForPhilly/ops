@@ -1,0 +1,20 @@
+---
+- hosts: masters
+  tasks:
+    - include: tasks/common.yml
+    - include: tasks/fedora-common.yml
+    - include: tasks/netdata/standard.yml
+  handlers:
+    - include: handlers/fedora-common.yml
+    # run common handlers last to avoid problems with transition to passwordless SSH
+    - include: handlers/common.yml
+
+- hosts: nodes
+  tasks:
+    - include: tasks/common.yml
+    - include: tasks/fedora-common.yml
+    - include: tasks/kubernetes/nodes.yml
+  handlers:
+    - include: handlers/fedora-common.yml
+    # run common handlers last to avoid problems with transition to passwordless SSH
+    - include: handlers/common.yml

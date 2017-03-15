@@ -1,2 +1,3 @@
 root-passwords.txt
 kubectl.kubeconfig
+kubernetes/alpha-cluster/ansible/inventory/hosts

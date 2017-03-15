@@ -1,0 +1,9 @@
+---
+- hosts: storage
+  tasks:
+    - include: tasks/common.yml
+    - include: tasks/suse-common.yml
+    - include: tasks/netdata/standard.yml
+    - include: tasks/suse-storage.yml
+  handlers:
+    - include: handlers/common.yml

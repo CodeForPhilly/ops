@@ -1,0 +1,39 @@
+---
+- name: set hostname
+  hostname: name={{ inventory_hostname }}
+- name: hosts file
+  copy: src=../hosts dest=/etc/hosts mode=0644
+- name: .ssh directory
+  file: path=/root/.ssh mode=0700 state=directory
+- name: authorized_keys file
+  copy: src=../authorized_keys dest=/root/.ssh/authorized_keys mode=0600
+- name: passwordless root logins
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin yes'
+    line: 'PermitRootLogin without-password'
+  notify:
+    - reload sshd
+- name: install firewalld
+  package: name=firewalld state=present
+- name: run firewalld
+  service: name=firewalld state=started enabled=yes
+- name: permit public ssh
+  firewalld:
+    service: ssh
+    state: enabled
+    permanent: yes
+    immediate: yes
+- name: permit public netdata dashboard
+  firewalld:
+    port: 19999/tcp
+    state: enabled
+    permanent: yes
+    immediate: yes
+- name: permit private network ingress
+  firewalld:
+    source: 192.168.0.0/16
+    zone: internal
+    state: enabled
+    permanent: yes
+    immediate: yes

@@ -1,0 +1,23 @@
+---
+- name: zfs packages repository
+  zypper_repository: name=filesystems repo=obs://filesystems auto_import_keys=yes
+- name: zfs kernel modules
+  zypper: name=zfs-kmp-default state=present disable_gpg_check=yes
+- name: zfs binaries
+  zypper: name=zfs state=present disable_gpg_check=yes
+- name: nfs server
+  zypper: name=nfs-kernel-server state=present disable_gpg_check=yes
+- name: load zfs module
+  modprobe: name=zfs state=present
+- name: persist zfs module load
+  shell: echo zfs > /etc/modules-load.d/zfs.conf
+  args:
+    creates: /etc/modules-load.d/zfs.conf
+- name: container volumes zpool
+  command: zpool create -f {{ zpool_name }} {{ zpool_device }}
+  args:
+    creates: /{{ zpool_name }}
+- name: run nfs server
+  systemd: name=nfs-server state=started enabled=yes
+- name: run zfs services
+  systemd: name=zfs.target state=started enabled=yes

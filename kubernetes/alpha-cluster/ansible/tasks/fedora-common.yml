@@ -1,0 +1,16 @@
+---
+- name: stop cockpit
+  service: name=cockpit state=stopped enabled=no
+- name: disallow cockpit
+  firewalld:
+    service: cockpit
+    state: disabled
+    immediate: yes
+    permanent: yes
+- name: persist permissive selinux
+  lineinfile:
+    dest: /etc/selinux/config
+    regexp: SELINUX=enforcing
+    line: SELINUX=permissive
+  notify:
+    - runtime permissive selinux
