@@ -37,3 +37,5 @@
     state: enabled
     permanent: yes
     immediate: yes
+  notify:
+    - accept internal zone

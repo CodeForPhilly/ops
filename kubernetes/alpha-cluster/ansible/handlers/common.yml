@@ -1,3 +1,9 @@
 ---
+- name: accept internal zone
+  shell: |
+    set -e
+    firewall-cmd --permanent --zone=internal --set-target=ACCEPT
+    firewall-cmd --zone=internal --set-target=ACCEPT
+# always run last in case authentication changes from password -> password-less
 - name: reload sshd
   service: name=sshd state=reloaded
