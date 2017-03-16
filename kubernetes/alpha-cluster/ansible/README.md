@@ -79,4 +79,3 @@ Some known problems with the playbooks yet to be resolved
 
 - the `lineinfile` module is not currently acting in an idempotent way, and re-adds
  the requested line every time
-- will the zfs kernel modules install on the first try on the storage server? unclear
