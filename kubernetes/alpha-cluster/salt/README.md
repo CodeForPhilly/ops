@@ -23,6 +23,4 @@ defaults:
 - firewalld module will not accept an empty string as a zone name (which is an
  alias for the default zone). Will need to set firewall rules using idempotent
  commands instead.
-- For some reason the network.system module will not set the hotname on suse.
- no idea what that's all about.
 - zpool will be created, but state will fail after that due to a bug

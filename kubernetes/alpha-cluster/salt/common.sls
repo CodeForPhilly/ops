@@ -7,8 +7,10 @@ common_install_firewalld:
 # Configure
 
 common_config_hostname:
-  network.system:
-    - hostname: {{ salt['grains.get']('id') }}
+  cmd.run:
+    - name: hostnamectl set-hostname {{ salt['grains.get']('id') }}
+    - unless:
+      - test "$(hostname)" = "{{ salt['grains.get']('id') }}"
 
 common_config_hosts:
   file.managed:
