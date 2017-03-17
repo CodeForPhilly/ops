@@ -25,5 +25,4 @@ defaults:
  commands instead.
 - For some reason the network.system module will not set the hotname on suse.
  no idea what that's all about.
-- zpool wont create
-- netdata script waits for the enter key.. i think because it realizes it's in a shell
+- zpool will be created, but state will fail after that due to a bug

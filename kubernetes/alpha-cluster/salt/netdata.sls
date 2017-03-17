@@ -29,7 +29,7 @@ netdata_install_deps:
 
 netdata_install_main:
   cmd.run:
-    - name: ./netdata-installer.sh --install /opt
+    - name: ./netdata-installer.sh --install /opt --dont-wait
     - cwd: /root/netdata
     - creates: /opt/netdata/etc/netdata/netdata.conf
 
