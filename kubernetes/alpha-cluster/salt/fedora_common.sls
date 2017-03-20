@@ -7,8 +7,12 @@ fedoracommon_config_selinux_permissive_persist:
     - repl: SELINUX=permissive
 
 fedoracommon_config_selinux_permissive_runtime:
-  selinux.mode:
-    - name: permissive
+  # selinux state module depends on policycoreutils-python-utils, which we don't
+  # actually need, so we wrap our own command instead
+  cmd.run:
+    - name: setenforce 0
+    - onlyif:
+      - 'sestatus | grep "Current mode:[[:space:]]\+enforcing"'
 
 fedoracommon_config_disallow_cockpit:
   cmd.run:
