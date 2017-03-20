@@ -47,26 +47,46 @@ common_svc_firewalld:
 
 # Configure firewalld service
 
-common_config_firewall_public:
-  firewalld.present:
-    - name: "''" # pass '' to the shell to specify default zone
-    - interfaces:
-      - eth0
-    - services:
-      - ssh
-    - ports:
-      - 19999/tcp
-
-common_config_firewall_private:
-  firewalld.present:
-    - name: internal
-    - sources:
-      - 192.168.0.0/16
-
-common_config_permit_private:
+common_config_firewall_eth0:
   cmd.run:
-    - name: |
-        firewall-cmd --permanent --zone=internal --set-target=ACCEPT
-        firewall-cmd --zone=internal --set-target=ACCEPT
-    - onchanges:
-      - firewalld: common_config_firewall_private
+    - name: firewallctl zone -p '' add interface eth0
+    - unless:
+      - firewallctl zone '' query interface eth0
+    - onchanges_in:
+      - cmd: common_config_firewall_reload
+
+common_config_firewall_ssh:
+  cmd.run:
+    - name: firewallctl zone -p '' add service ssh
+    - unless:
+      - firewallctl zone '' query service ssh
+    - onchanges_in:
+      - cmd: common_config_firewall_reload
+
+common_config_firewall_netdata:
+  cmd.run:
+    - name: firewallctl zone -p '' add port 19999/tcp
+    - unless:
+      - firewallctl zone '' query port 19999/tcp
+    - onchanges_in:
+      - cmd: common_config_firewall_reload
+
+common_config_firewall_internal_source:
+  cmd.run:
+    - name: firewallctl zone -p internal add source 192.168.0.0/16
+    - unless:
+      - firewallctl zone internal query source 192.168.0.0/16
+    - onchanges_in:
+      - cmd: common_config_firewall_reload
+
+common_config_internal_target:
+  cmd.run:
+    - name: firewall-cmd --permanent --zone=internal --set-target=ACCEPT
+    - unless:
+      - 'firewallctl info zone internal | grep "target: ACCEPT"'
+    - onchanges_in:
+      - cmd: common_config_firewall_reload
+
+common_config_firewall_reload:
+  cmd.run:
+    - name: firewallctl reload
