@@ -11,12 +11,12 @@ fedoracommon_config_selinux_permissive_runtime:
     - name: permissive
 
 fedoracommon_config_disallow_cockpit:
-  module.run:
-    - name: firewalld.remove_service
-    - service: cockpit
-    - zone: ''
+  cmd.run:
+    - name: firewallctl zone -p '' remove service cockpit
     - onlyif:
       - firewallctl zone '' query service cockpit
+    - onchanges_in:
+      - cmd: common_config_firewall_reload
 
 # Services
 
