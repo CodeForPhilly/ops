@@ -38,6 +38,7 @@ storage_nfs_suse_configure_zpool:
         force: true
     - layout:
       - {{ zpool_device }}
+    - properties: {} # Bug in state assumes 'properties' value is present
 
 # Services
 
