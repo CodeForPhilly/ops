@@ -17,10 +17,3 @@ Additionally, the following optional pillars may be provided to override the
 defaults:
 
 `storage.zpool_name`: The name of the zpool to be created for container volumes
-
-## Known issues
-
-- firewalld module will not accept an empty string as a zone name (which is an
- alias for the default zone). Will need to set firewall rules using idempotent
- commands instead.
-- zpool will be created, but state will fail after that due to a bug
