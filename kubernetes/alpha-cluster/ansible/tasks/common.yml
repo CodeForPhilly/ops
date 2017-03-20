@@ -10,7 +10,7 @@
 - name: passwordless root logins
   lineinfile:
     dest: /etc/ssh/sshd_config
-    regexp: '^PermitRootLogin yes'
+    regexp: '^PermitRootLogin'
     line: 'PermitRootLogin without-password'
   notify:
     - reload sshd
