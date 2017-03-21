@@ -4,6 +4,7 @@ base:
   kub*master*:
     - fedora_common
     - netdata
+    - kubernetes.master
   kub*node*:
     - fedora_common
     - kubernetes.node
