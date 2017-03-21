@@ -38,3 +38,9 @@ Build your Root CA
 > 1. sudo ./makerootca.sh
 > 2. Use a password that you will remember.
 > 3. Verify you get your sha256 Signature
+
+
+TODO --
+
+> 1. Write instructions on how to make the intermediate CA
+> 2. Rules and regulations.
