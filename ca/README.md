@@ -1,7 +1,7 @@
-Project-Pokemon
+Auto Build CA
 ===============
 
-Secure TLS with Certificate Authority of data transit between external entity and internal entity.
+Secure TLS with Certificate Authority build of Root CA and Intermediate CA
 
 Components
 -------------
@@ -19,3 +19,14 @@ The following components are considered.
 > - Root CA Creation [makerootca.sh]
 > - Intermediate CA Creation [makeintermediateca.sh]
 > - OCSP CA Creation [makerootocsp.sh]
+> - Make Server Certificate [createservercertificate.sh]
+
+Getting Started
+---------------
+
+You will be buiding two Certificate Authorities, a Root CA which will only be used to sign the Intermediate CA. The Intermdiate CA will be used to assign certificates.
+
+You will also need to choose a revocation strategy, CRL or OSCP.
+
+> 1. Copy the directory to a location on your server.
+> 2. configure the openssl.cnf
