@@ -1,0 +1,3 @@
+kubernetes:
+  master:
+    enabled: true
