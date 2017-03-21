@@ -11,3 +11,4 @@ base:
     - suse_common
     - netdata
     - storage.nfs_suse
+    - storage.volumes
