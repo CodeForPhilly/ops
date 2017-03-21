@@ -31,3 +31,10 @@ You will also need to choose a revocation strategy, CRL or OSCP.
 > 1. Copy the directory to a location on your server.
 > 2. configure the openssl.cnf
 > 3. Edit the makecaroot.sh and makintermediateca.sh configuration variables for your CA.
+
+
+Build your Root CA
+------------------
+> 1. sudo ./makerootca.sh
+> 2. Use a password that you will remember.
+> 3. Verify you get your sha256 Signature
