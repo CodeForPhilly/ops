@@ -1,6 +1,6 @@
 base:
   kub*master*:
-    - kuberneters.master
+    - kubernetes.master
     - storage
   kub*vol*:
     - storage
