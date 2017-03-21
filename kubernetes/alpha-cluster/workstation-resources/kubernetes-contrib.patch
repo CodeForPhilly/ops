@@ -1,8 +1,8 @@
 diff --git a/ansible/inventory/group_vars/all.yml b/ansible/inventory/group_vars/all.yml
-index df4ccbd4..4ee8d9b2 100644
+index e7d2abb..723442a 100644
 --- a/ansible/inventory/group_vars/all.yml
 +++ b/ansible/inventory/group_vars/all.yml
-@@ -23,6 +23,7 @@ cluster_name: cluster.local
+@@ -26,6 +26,7 @@ cluster_name: cluster.local
  # the managed machines. The user must be able to use sudo without asking
  # for password unless ansible_sudo_pass is set
  #ansible_ssh_user: root
@@ -10,9 +10,47 @@ index df4ccbd4..4ee8d9b2 100644
  
  # password for the ansible_ssh_user. If this is unset you will need to set up
  # ssh keys so a password is not needed.
+@@ -88,16 +89,16 @@ flannel_host_prefix: 24
+ #contiv_default_gw: 172.16.0.1
+ 
+ # Set to false to disable logging with elasticsearch
+-cluster_logging: true
++cluster_logging: false
+ 
+ # Turn to false to disable cluster monitoring with heapster and influxdb
+-cluster_monitoring: true
++cluster_monitoring: false
+ 
+ # Turn to false to disable the kube-ui addon for this cluster
+ kube_ui: false
+ 
+ # Turn to false to disable the kube-dash addon for this cluster
+-kube_dash: false
++kube_dash: true
+ 
+ # Turn to false to disable the node_problem_detector addon for this cluster
+ node_problem_detector: false
+@@ -105,7 +106,7 @@ node_problem_detector: false
+ # Turn this varable to 'false' to disable whole DNS configuration.
+ dns_setup: true
+ # How many replicas in the Replication Controller
+-dns_replicas: 1
++dns_replicas: 2
+ 
+ # Certificate authority private key should not be kept on server
+ # but you probably want to keep it to generate user certificates. Set
+@@ -113,7 +114,7 @@ dns_replicas: 1
+ # It's recommanded to remove the private key from the server. So if you set
+ # kube_cert_keep_ca to true, please copy the ca.key file somewhere that
+ # is secured, and remove it from server.
+-kube_cert_keep_ca: false
++kube_cert_keep_ca: true
+ 
+ # There are other variable in roles/kubernetes/defaults/main.yml but changing
+ # them comes with a much higher risk to your cluster. So proceed over there
 diff --git a/ansible/inventory/inventory b/ansible/inventory/inventory
 new file mode 100644
-index 00000000..01779abe
+index 0000000..01779ab
 --- /dev/null
 +++ b/ansible/inventory/inventory
 @@ -0,0 +1,9 @@
