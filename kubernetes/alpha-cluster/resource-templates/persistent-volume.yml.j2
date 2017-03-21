@@ -1,0 +1,24 @@
+{#
+  Required params:
+  - storage_path_prefix
+  - container_name
+  - volume_name
+  - volume_quota
+  - volume_host
+#}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: '{{ container_name|lower }}.{{ volume_name|lower }}'
+  labels:
+    container: '{{ container_name }}'
+    volume: '{{ volume_name }}'
+spec:
+  capacity:
+    storage: '{{ volume_quota }}'
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: '{{ storage_path_prefix }}/{{ container_name }}/{{ volume_name }}'
+    server: '{{ volume_host }}'
