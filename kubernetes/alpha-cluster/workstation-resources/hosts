@@ -7,3 +7,4 @@ fe80::1%lo0     localhost
 45.33.87.205		kubnode01
 23.92.20.210		kubnode02
 45.33.84.220		kubvol01
+66.175.210.124  graylog
