@@ -1,5 +1,6 @@
 base:
   '*':
+    - ops_git
     - common
   kub*master*:
     - fedora_common
@@ -7,7 +8,8 @@ base:
     - kubernetes.master
   kub*node*:
     - fedora_common
-    - kubernetes.node
+    - docker.fedora
+    - docker.images
   kub*vol*:
     - suse_common
     - netdata
