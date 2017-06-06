@@ -3,6 +3,6 @@
 docker_service:
   service.running:
     - name: docker
-    - enabled: true
+    - enable: true
     - watch:
       - file: docker_config_sysconfig

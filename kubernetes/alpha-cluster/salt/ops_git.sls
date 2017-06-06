@@ -1,5 +1,5 @@
 
-{% set args = pillat.get('ops', {}).get('git', {}) %}
+{% set args = pillar.get('ops', {}).get('git', {}) %}
 {% do args.setdefault('name', 'https://github.com/CodeForPhilly/ops.git') %}
 {% do args.setdefault('target', '/opt/ops') %}
 
