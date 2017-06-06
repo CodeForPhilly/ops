@@ -4,3 +4,4 @@ kubernetes/alpha-cluster/ansible/inventory/hosts
 /keyrings/live/pubring.kbx~
 /keyrings/live/secring.gpg
 /kubernetes/alpha-cluster/root-passwords.txt
+/kubernetes/alpha-cluster/workstation-resources/kubectl.kubeconfig
