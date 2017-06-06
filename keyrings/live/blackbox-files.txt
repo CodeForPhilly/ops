@@ -1,1 +1,2 @@
 kubernetes/alpha-cluster/root-passwords.txt
+kubernetes/alpha-cluster/workstation-resources/kubectl.kubeconfig
