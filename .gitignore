@@ -5,3 +5,4 @@ kubernetes/alpha-cluster/ansible/inventory/hosts
 /keyrings/live/secring.gpg
 /kubernetes/alpha-cluster/root-passwords.txt
 /kubernetes/alpha-cluster/workstation-resources/kubectl.kubeconfig
+/kubernetes/alpha-cluster/namespaces/default/secrets/postgres-shared-admin.yml
