@@ -9,3 +9,6 @@ docker:
     nginx-edge:1.13r1:
       state: present
       build: /opt/ops/docker/images/nginx-edge
+    postgres-shared:9.6r1:
+      state: present
+      build: /opt/ops/docker/images/postgres-shared
