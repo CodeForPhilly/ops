@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluentd-aggregator
+  namespace: kube-system
+spec:
+  selector:
+    id: fluentd-aggregator
+  ports:
+    - name: tcp-forward
+      protocol: TCP
+      port: 24224
+    - name: udp-forward
+      protocol: UDP
+      port: 24224

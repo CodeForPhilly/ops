@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: fluentd-shipper
+  namespace: kube-system
+spec:
+  template:
+    metadata:
+      labels:
+        id: fluentd-shipper
+    spec:
+      containers:
+        - name: fluentd
+          image: fluentd-shipper:v0.12r1
+          volumeMounts:
+            - name: system-logs
+              mountPath: /var/log
+            - name: docker-logs
+              mountPath: /var/lib/docker/containers
+          env:
+            - name: FLUENT_UID
+              value: '0'
+      volumes:
+        - name: system-logs
+          hostPath:
+            path: /var/log
+        - name: docker-logs
+          hostPath:
+            path: /var/lib/docker/containers

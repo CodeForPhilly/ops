@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: fluentd-aggregator
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        id: fluentd-aggregator
+    spec:
+      dnsPolicy: ClusterFirst
+      volumes:
+        - name: fluentd-aggregator-buffer
+          persistentVolumeClaim:
+            claimName: fluentd-aggregator.buffer
+      containers:
+        - name: fluentd-aggregator
+          image: fluentd-aggregator:v0.12r1
+          ports:
+            - containerPort: 24224
+              protocol: TCP
+            - containerPort: 24224
+              protocol: UDP
+          volumeMounts:
+            - mountPath: /fluentd/buffer
+              name: fluentd-aggregator-buffer

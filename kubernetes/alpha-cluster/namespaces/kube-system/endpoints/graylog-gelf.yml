@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: graylog-gelf
+  namespace: kube-system
+subsets:
+  - addresses:
+      - ip: 192.168.223.12
+    ports:
+      - name: udp-gelf
+        port: 12201
+        protocol: UDP
+      - name: tcp-gelf
+        port: 12201
+        protocol: TCP

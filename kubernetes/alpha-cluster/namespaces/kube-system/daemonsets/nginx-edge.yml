@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: nginx-edge
+  namespace: kube-system
+spec:
+  template:
+    metadata:
+      labels:
+        id: nginx-edge
+    spec:
+      containers:
+        - name: nginx-edge
+          image: nginx-edge:1.13r1
+          ports:
+            - containerPort: 80
+              hostPort: 80
+            - containerPort: 443
+              hostPort: 443
+          volumeMounts:
+            - name: ssl
+              mountPath: /etc/ssl
+      volumes:
+        - name: ssl
+          hostPath:
+            path: /etc/ssl
