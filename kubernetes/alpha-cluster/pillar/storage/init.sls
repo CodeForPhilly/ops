@@ -4,6 +4,7 @@ storage:
     - name: fluentd-aggregator
       volumes:
         - name: buffer
-          quota: 4G
           user: 1000
           group: 1000
+          properties:
+            quota: 4G
