@@ -8,3 +8,11 @@ storage:
           group: 1000
           properties:
             quota: 4G
+    - name: postgres-shared
+      volumes:
+        - name: data
+          properties:
+            quota: 16G
+        - name: userdata
+          properties:
+            quota: 16M
