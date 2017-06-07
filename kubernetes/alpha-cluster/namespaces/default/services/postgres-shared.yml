@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-shared
+spec:
+  selector:
+    id: postgres-shared
+  ports:
+    - protocol: TCP
+      port: 5432

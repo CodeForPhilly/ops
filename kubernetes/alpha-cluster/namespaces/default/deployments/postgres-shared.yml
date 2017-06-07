@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: postgres-shared
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        id: postgres-shared
+    spec:
+      dnsPolicy: ClusterFirst
+      volumes:
+        - name: postgres-shared-data
+          persistentVolumeClaim:
+            claimName: postgres-shared-data
+        - name: postgres-shared-userdata
+          persistentVolumeClaim:
+            claimName: postgres-shared-userdata
+      containers:
+        - name: postgres-shared
+          image: postgres-shared:9.6r1
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/volume
+              name: postgres-shared-data
+            - mountPath: /userdata
+              name: postgres-shared-userdata
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/volume
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-shared-admin
+                  key: password
