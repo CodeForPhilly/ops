@@ -4,10 +4,12 @@ metadata:
   name: graylog-gelf
   namespace: kube-system
 spec:
+  type: ExternalName
+  externalName: graylog
   ports:
-    - name: udp-gelf
+    - name: gelf-udp
       protocol: UDP
       port: 12201
-    - name: tcp-gelf
+    - name: gelf-tcp
       protocol: TCP
       port: 12201
