@@ -1,3 +1,4 @@
+kubernetes/alpha-cluster/graylog-admin.txt
 kubernetes/alpha-cluster/namespaces/default/secrets/postgres-shared-admin.yml
 kubernetes/alpha-cluster/root-passwords.txt
 kubernetes/alpha-cluster/workstation-resources/kubectl.kubeconfig
