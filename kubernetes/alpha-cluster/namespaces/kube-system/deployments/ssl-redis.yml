@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ssl-redis
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        id: ssl-redis
+    spec:
+      dnsPolicy: ClusterFirst
+      containers:
+        - name: ssl-redis
+          image: redis:3.2.9-alpine
+          ports:
+            - containerPort: 6379
