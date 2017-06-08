@@ -14,7 +14,7 @@ spec:
       volumes:
         - name: fluentd-aggregator-buffer
           persistentVolumeClaim:
-            claimName: fluentd-aggregator.buffer
+            claimName: fluentd-aggregator-buffer
       containers:
         - name: fluentd-aggregator
           image: fluentd-aggregator:v0.12r1
