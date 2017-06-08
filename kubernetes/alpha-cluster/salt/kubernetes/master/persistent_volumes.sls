@@ -24,12 +24,16 @@ kubernetes_master_init_vol_{{ container_name }}_{{ vol_name }}:
 kubernetes_master_create_vol_{{ container_name }}_{{ vol_name }}:
   cmd.run:
     - name: kubectl create -f {{ resource_prefix }}/{{ container_name }}-{{ vol_name }}.yml
+    - onlyif:
+      - which kubectl
     - unless:
       - kubectl get -f {{ resource_prefix }}/{{ container_name }}-{{ vol_name }}.yml
 
 kubernetes_master_apply_vol_{{ container_name }}_{{ vol_name }}:
   cmd.run:
     - name: kubectl apply -f {{ resource_prefix }}/{{ container_name }}-{{ vol_name }}.yml
+    - onlyif:
+      - which kubectl
     - onchanges:
       - file: kubernetes_master_init_vol_{{ container_name }}_{{ vol_name }}
   {% endfor %}
