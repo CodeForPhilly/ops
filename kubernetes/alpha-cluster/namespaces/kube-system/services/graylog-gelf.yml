@@ -5,7 +5,7 @@ metadata:
   namespace: kube-system
 spec:
   type: ExternalName
-  externalName: graylog
+  externalName: 192.168.223.12
   ports:
     - name: gelf-udp
       protocol: UDP
