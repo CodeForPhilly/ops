@@ -9,6 +9,7 @@ base:
   kub*node*:
     - fedora_common
     - docker.fedora
+    - kubernetes.node
     - docker.images
   kub*vol*:
     - suse_common
