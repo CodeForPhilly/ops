@@ -1,6 +1,6 @@
 docker:
   images:
-    fluentd-aggregator:v0.12r1:
+    fluentd-aggregator:v0.12r2:
       state: present
       build: /opt/ops/docker/images/fluentd-aggregator
     fluentd-collector:v0.12r1:
