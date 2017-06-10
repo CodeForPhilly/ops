@@ -6,6 +6,7 @@ metadata:
 spec:
   selector:
     id: fluentd-aggregator
+  clusterIP: None
   ports:
     - name: fluentd-tcp
       protocol: TCP
