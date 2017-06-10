@@ -17,7 +17,7 @@ spec:
             claimName: fluentd-aggregator-buffer
       containers:
         - name: fluentd-aggregator
-          image: fluentd-aggregator:v0.12r1
+          image: fluentd-aggregator:v0.12r2
           ports:
             - containerPort: 24224
               protocol: TCP
