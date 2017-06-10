@@ -7,9 +7,9 @@ spec:
   selector:
     id: fluentd-aggregator
   ports:
-    - name: tcp-forward
+    - name: fluentd-tcp
       protocol: TCP
       port: 24224
-    - name: udp-forward
+    - name: fluentd-udp
       protocol: UDP
       port: 24224
