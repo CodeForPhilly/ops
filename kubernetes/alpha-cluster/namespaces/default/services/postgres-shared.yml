@@ -5,6 +5,7 @@ metadata:
 spec:
   selector:
     id: postgres-shared
+  clusterIP: None
   ports:
     - protocol: TCP
       port: 5432
