@@ -6,6 +6,7 @@ metadata:
 spec:
   selector:
     id: ssl-redis
+  clusterIP: None
   ports:
     - protocol: TCP
       port: 6379
