@@ -1,0 +1,46 @@
+apiVersion: batch/v2alpha1
+kind: CronJob
+metadata:
+  name: sms
+  namespace: yadaguru
+spec:
+  schedule: '4 16 * * *'
+  concurrencyPolicy: Replace
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: sms
+              image: yadaguru/sms:1.0.1
+              env:
+                - name: NODE_ENV
+                  value: production
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: secrets
+                      key: postgres-connection
+                - name: SECRET_SALT
+                  valueFrom:
+                    secretKeyRef:
+                      name: secrets
+                      key: secret-salt
+                - name: APP_DOMAIN
+                  value: www.yadaguru.com
+                - name: TWILIO_PHONE_NUMBER
+                  valueFrom:
+                    secretKeyRef:
+                      name: secrets
+                      key: twilio-phone-number
+                - name: TWILIO_ACCOUNT_SID
+                  valueFrom:
+                    secretKeyRef:
+                      name: secrets
+                      key: twilio-account-sid
+                - name: TWILIO_AUTH_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: secrets
+                      key: twilio-auth-token
