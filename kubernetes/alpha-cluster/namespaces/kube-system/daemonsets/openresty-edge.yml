@@ -12,7 +12,7 @@ spec:
       dnsPolicy: ClusterFirst
       containers:
         - name: openresty-edge
-          image: openresty-edge:1.11.2.3r1
+          image: openresty-edge:1.11.2.3r2
           ports:
             - containerPort: 80
               hostPort: 80

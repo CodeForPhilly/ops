@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: api
+  namespace: yadaguru
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        id: api
+    spec:
+      dnsPolicy: ClusterFirst
+      containers:
+        - name: api
+          image: yadaguru/api:1.1.0
+          ports:
+            - containerPort: 3005
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: secret-key
+            - name: SECRET_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: secret-salt
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: postgres-connection
+            - name: TWILIO_PHONE_NUMBER
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: twilio-phone-number
+            - name: TWILIO_ACCOUNT_SID
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: twilio-account-sid
+            - name: TWILIO_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: twilio-auth-token
