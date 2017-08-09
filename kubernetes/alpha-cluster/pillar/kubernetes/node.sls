@@ -12,6 +12,6 @@ docker:
     postgres-shared:9.6r1:
       state: present
       build: /opt/ops/docker/images/postgres-shared
-    openresty-edge:1.11.2.3r1:
+    openresty-edge:1.11.2.3r2:
       state: present
       build: /opt/ops/docker/images/openresty-edge
