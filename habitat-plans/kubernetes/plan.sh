@@ -1,5 +1,10 @@
 pkg_name=kubernetes
 pkg_origin=codeforphilly
+pkg_description="Production-Grade Container Scheduling and Management"
+pkg_upstream_url=https://github.com/kubernetes/kubernetes
+pkg_license=('Apache-2.0')
+pkg_maintainer="Chris Alfano <chris@codeforphilly.org>"
+
 pkg_bin_dirs=(bin)
 
 pkg_build_deps=(
