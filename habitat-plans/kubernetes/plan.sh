@@ -17,7 +17,11 @@ pkg_deps=(
 )
 
 pkg_version() {
-  echo "${pkg_last_version}+$(git rev-list ${pkg_last_tag}..${pkg_commit} --count)#${pkg_commit}"
+  if [ "${pkg_commits_count}" -eq "0" ]; then
+    echo "${pkg_last_version}"
+  else
+    echo "${pkg_last_version}+${pkg_commits_count}#${pkg_commit}"
+  fi
 }
 
 do_download() {
@@ -31,7 +35,8 @@ do_download() {
   test -n "${pkg_commit}" || { warn "Could not determine HEAD for src submodule"; return 1; }
 
   pkg_last_tag="$(git describe --tags --abbrev=0 ${pkg_commit})"
-  pkg_last_version=${pkg_last_tag#v}
+  pkg_last_version="${pkg_last_tag#v}"
+  pkg_commits_count="$(git rev-list ${pkg_last_tag}..${pkg_commit} --count)"
 
   update_pkg_version
 }
