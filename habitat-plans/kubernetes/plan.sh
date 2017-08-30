@@ -11,7 +11,7 @@ pkg_build_deps=(
   core/git
   core/make
   core/gcc
-  jarvus/go # change to core/go once core-plans#701 gets merged
+  core/go
   core/diffutils
   core/which
   core/rsync
