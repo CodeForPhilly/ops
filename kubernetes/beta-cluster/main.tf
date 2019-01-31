@@ -11,14 +11,17 @@ variable "region" {
   default = "us-east"
 }
 variable "ssh_public_key" {
-  default = "/home/chris/.ssh/id_rsa.pub"
+  default = "~/.ssh/id_rsa.pub"
+}
+variable "linode_token" {
+  default = ""
 }
 module "k8s" {
   source  = "git::https://github.com/linode/terraform-linode-k8s.git?ref=for-cli"
 
-  linode_token = "0c6d09dd263e681c2d6546de6a3d269c538331491483d811880dda570dd03db2"
-  
-  linode_group = "kafKaMGxRRb-codeforphilly"
+  linode_token = "${var.linode_token}"
+
+  linode_group = "k8s-beta"
 
   server_type_node = "${var.server_type_node}"
 
