@@ -1,0 +1,4 @@
+[submodule "kubernetes"]
+	path = habitat-plans/kubernetes/src
+	url = https://github.com/kubernetes/kubernetes.git
+	branch = release-1.7
