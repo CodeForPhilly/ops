@@ -54,3 +54,13 @@ kubectl apply --validate=false -f cert-manager.yaml
 # do it twice if it fails?
 kubectl apply -f cert-manager.issuers.yaml
 ```
+
+## ingress installed
+
+Adopted from [How to Set Up an Nginx Ingress with Cert-Manager on DigitalOcean Kubernetes](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes):
+
+```bash
+kubectl apply -f ingress-nginx.yaml
+kubectl apply -f ingress-nginx.loadbalancer.yaml
+kubectl get svc --namespace=ingress-nginx
+```
