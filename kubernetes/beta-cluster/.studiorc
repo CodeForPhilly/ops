@@ -1,8 +1,23 @@
 #!/bin/bash
 
-hab pkg install core/python --binlink
+hab pkg install --binlink \
+    core/python \
+    core/terraform \
+    core/kubectl \
+    core/openssh \
+    core/git
+
 pip install linode-cli
 hab pkg binlink core/python linode-cli
+
+if [ ! -f /root/.ssh/id_rsa.pub ]; then
+    echo
+    echo "--> Generating /root/.ssh/id_rsa"
+    echo
+    ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -N ""
+fi
+
+eval $(ssh-agent) && ssh-add /root/.ssh/id_rsa
 
 echo
 echo "--> Installed linode-cli"
