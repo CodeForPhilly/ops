@@ -46,3 +46,9 @@ kubectl proxy
 kubectl apply -f kubernetes-dashboard.yaml
 kubectl apply -f serviceaccount.yaml
 ```
+
+## cert-manager installed
+
+```bash
+kubectl apply --validate=false -f cert-manager.yaml
+```
