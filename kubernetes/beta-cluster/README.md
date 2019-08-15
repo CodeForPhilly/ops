@@ -20,3 +20,29 @@ hab studio enter
 kubectl get nodes
 linode-cli linodes list
 ```
+
+### Get into dashboard
+
+```bash
+KUBE_ADMIN_TOKEN_NAME=$(kubectl get secret -n kube-system | grep cfp-admin-token | awk '{print $1}')
+kubectl describe secret -n kube-system "${KUBE_ADMIN_TOKEN_NAME}"
+# copy token
+kubectl proxy
+# open http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login
+# login with token
+```
+
+## Cluster journal
+
+### Cluster created
+
+```bash
+./linode-create.sh
+```
+
+### Dashboard installed
+
+```bash
+kubectl apply -f kubernetes-dashboard.yaml
+kubectl apply -f serviceaccount.yaml
+```
