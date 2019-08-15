@@ -8,7 +8,7 @@ From this directory:
 
 ```bash
 # tell git that keybase submodules are OK
-export GIT_ALLOW_PROTOCOL=keybase
+export GIT_ALLOW_PROTOCOL=keybase:ssh
 
 # ensure this repository is cloned recursively
 git submodule update --init
