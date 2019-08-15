@@ -1,0 +1,9 @@
+#!/bin/bash
+
+hab pkg install core/python --binlink
+pip install linode-cli
+hab pkg binlink core/python linode-cli
+
+echo
+echo "--> Installed linode-cli"
+echo
