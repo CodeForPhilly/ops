@@ -51,4 +51,6 @@ kubectl apply -f serviceaccount.yaml
 
 ```bash
 kubectl apply --validate=false -f cert-manager.yaml
+# do it twice if it fails?
+kubectl apply -f cert-manager.issuers.yaml
 ```
