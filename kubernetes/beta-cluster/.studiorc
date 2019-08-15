@@ -5,8 +5,10 @@ hab pkg install --binlink \
     core/terraform \
     core/kubectl \
     core/openssh \
-    core/git
+    core/git \
+    core/curl
 
+export SSL_CERT_FILE=$(hab pkg path core/cacerts)/ssl/cert.pem
 pip install linode-cli
 hab pkg binlink core/python linode-cli
 
