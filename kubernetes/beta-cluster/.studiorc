@@ -15,14 +15,17 @@ export SSL_CERT_FILE=$(hab pkg path core/cacerts)/ssl/cert.pem
 pip install linode-cli
 hab pkg binlink core/python linode-cli
 
-if [ ! -f /root/.ssh/id_rsa.pub ]; then
+export HOME="/src/home"
+export TF_DATA_DIR="${HOME}/.k8s-alpha-linode/beta-cluster"
+
+if [ ! -f "${HOME}/.ssh/id_rsa.pub" ]; then
     echo
-    echo "--> Generating /root/.ssh/id_rsa"
+    echo "--> Generating ${HOME}/.ssh/id_rsa"
     echo
-    ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -N ""
+    ssh-keygen -b 2048 -t rsa -f "${HOME}/.ssh/id_rsa" -N ""
 fi
 
-eval $(ssh-agent) && ssh-add /root/.ssh/id_rsa
+eval $(ssh-agent) && ssh-add "${HOME}/.ssh/id_rsa"
 
 echo
 echo "--> Installed linode-cli"

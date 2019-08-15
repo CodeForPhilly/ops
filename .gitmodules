@@ -1,0 +1,3 @@
+[submodule "kubernetes/beta-cluster/home"]
+	path = kubernetes/beta-cluster/home
+	url = keybase://team/codeforphilly/root
