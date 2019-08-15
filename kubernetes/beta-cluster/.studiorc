@@ -8,6 +8,9 @@ hab pkg install --binlink \
     core/git \
     core/curl
 
+hab pkg binlink core/busybox-static which
+hab pkg binlink --dest /usr/bin core/coreutils env
+
 export SSL_CERT_FILE=$(hab pkg path core/cacerts)/ssl/cert.pem
 pip install linode-cli
 hab pkg binlink core/python linode-cli
