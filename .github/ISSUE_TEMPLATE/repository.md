@@ -7,11 +7,11 @@ assignees: ''
 
 ---
 
-- **Link to project profile**: https://codeforphilly.org/projects/project-slug
-- **Desired repository name**: https://github.com/CodeForPhilly/project-slug
+- [ ] **Link to project profile**: https://codeforphilly.org/projects/project-slug
+- [ ] **Desired repository name**: https://github.com/CodeForPhilly/project-slug
   - *We recommend the [monorepo pattern](https://gomonorepo.org/) be employed if possible*
   - *Repository names should be all-lower, [kebab-case](https://en.toolpage.org/tool/kebabcase)*
-- **GitHub users who should have admin access**:
+- [ ] **GitHub users who should have admin access**:
   - @example
-- **GitHub users who should have write access**:
+- [ ] **GitHub users who should have write access**:
   - @example
