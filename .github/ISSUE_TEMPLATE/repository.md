@@ -12,6 +12,8 @@ assignees: ''
   - *We recommend the [monorepo pattern](https://gomonorepo.org/) be employed if possible*
   - *Repository names should be all-lower, [kebab-case](https://en.toolpage.org/tool/kebabcase)*
 - [ ] **License to initialize repository with**: MIT
+  - *Use an identifier listed in the [SPDX License List](https://spdx.org/licenses/)*
+  - *We recommend MIT unless you have a specific reason to choose anything else*
 - [ ] **GitHub users who should have admin access**:
   - @example
 - [ ] **GitHub users who should have write access**:
