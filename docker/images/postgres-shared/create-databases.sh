@@ -1,13 +1,41 @@
+#
+# Will process each .txt file in DB_USERDATA_HOME
+# and configure users, databases, and privileges
+# acordingly. Each line in the file is one
+# configuration and must be of the format:
+#
+# database:username:privilege:passwd
+#
+# Where <privilege> is one of "rw", "ro",
+# "none", or "delete". If <passwd> is blank,
+# it will be ignored.
+#
 set -e
 
 : ${POSTGRES_USER:=postgres}
+: ${DB_USERDATA_HOME:=/userdata}
 
-DB_USERDATA_HOME=/userdata
+get_dbs()
+{
+  _dbs=$(echo '\l' | psql -qtU "$POSTGRES_USER" | cut -d \| -f1)
+  # trim whitespace
+  set -- $_dbs
+  echo $@
+}
 
-have_db()
+get_users()
+{
+  _users=$(echo '\du' | psql -qtU "$POSTGRES_USER" | cut -d \| -f1)
+  # trim whitespace
+  set -- $_users
+  echo $@
+}
+
+db_is_in()
 {
   _db=$1
-  for _created in $CREATED_DBS; do
+  _set=$2
+  for _created in $_set; do
     if [ "$_created" = "$_db" ]; then
       return 0
     fi
@@ -15,10 +43,11 @@ have_db()
   return 1
 }
 
-have_user()
+user_is_in()
 {
   _user=$1
-  for _created in $CREATED_USERS; do
+  _set=$2
+  for _created in $_set; do
     if [ "$_created" = "$_user" ]; then
       return 0
     fi
@@ -26,42 +55,55 @@ have_user()
   return 1
 }
 
-CREATED_DBS=$(echo '\l' | psql -qtU "$POSTGRES_USER" | cut -d \| -f1)
-CREATED_USERS=$(echo '\du' | psql -qtU "$POSTGRES_USER" | cut -d \| -f1)
-
-# Get rid of crufty whitespace
-saved_args=$@
-set -- $CREATED_DBS
-CREATED_DBS=$@
-set -- $CREATED_USERS
-CREATED_USERS=$@
-set -- $saved_args
-
 for userdata_file in $(find $DB_USERDATA_HOME -type f -name '*.txt' -print); do
-  while read db passwd; do
+  IFS=:
+  while read db user privilege passwd; do
+    IFS=$(printf ' \t\n')
 
-    if have_db "$db"; then
-      echo "found database $db"
+    # Database management - generate statement
+    if db_is_in "$db" "$(get_dbs)" || [ -z "$db" ]; then
+      db_stmt=""
     else
       echo "creating database $db"
-      psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" <<EOSQL
-        CREATE DATABASE $db;
-EOSQL
+      db_stmt="CREATE DATABASE $db;"
     fi
 
-    user_action=
-    if have_user "$db"; then
-      echo "found user $db"
-      user_action=ALTER
+    # User management - generate statements
+    if [ -z "$user" ]; then
+      user_stmt=""
+    elif [ "$privilege" = 'delete' ]; then
+      echo "removing user $user"
+      user_stmt="DROP USER IF EXISTS $user;"
     else
-      echo "creating user $db"
-      user_action=CREATE
+      if user_is_in "$user" "$(get_users)"; then
+        echo "reconfiguring user $user"
+        user_stmt_action=ALTER
+      else
+        echo "creating user $user"
+        user_stmt_action=CREATE
+      fi
+      user_stmt="$user_stmt_action USER $user"
+      if [ -n "$passwd" ]; then
+        user_stmt="$user_stmt PASSWORD '$passwd'"
+      fi
+      user_stmt="$user_stmt;"
     fi
 
+    case $privilege in
+        rw) grant_stmt="GRANT ALL ON DATABASE $db TO $user;";;
+        ro) grant_stmt="GRANT CONNECT ON DATABASE $db TO $user;";;
+      none) grant_stmt="REVOKE ALL ON DATABASE $db FROM $user;";;
+         *) grant_stmt="";;
+    esac
+
+    # Execute statements 
     psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" <<EOSQL
-      $user_action USER $db PASSWORD '$passwd';
-      GRANT ALL PRIVILEGES ON DATABASE $db to $db;
+      $db_stmt
+      $user_stmt
+      $grant_stmt
 EOSQL
 
+  IFS=:
   done < "$userdata_file"
+IFS=$(printf ' \t\n')
 done
