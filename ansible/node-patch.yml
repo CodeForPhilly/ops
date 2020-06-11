@@ -1,7 +1,7 @@
 #!/usr/bin/env ansible-playbook
 ---
 - name: Patch systems
-  hosts: all
+  hosts: nodes
   serial: 1
   max_fail_percentage: 0
   become: true

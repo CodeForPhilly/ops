@@ -42,7 +42,7 @@
       delegate_to: localhost
 
 - name: 'Initialize ansible environment'
-  hosts: all
+  hosts: nodes
   gather_facts: false
   vars:
     ansible_user: root
