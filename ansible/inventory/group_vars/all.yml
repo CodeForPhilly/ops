@@ -1,2 +1,4 @@
 admin_user: civic-admin
+
+ansible_user: "{{ admin_user }}"
 ansible_python_interpreter: /home/{{ admin_user }}/.python/bin/python
