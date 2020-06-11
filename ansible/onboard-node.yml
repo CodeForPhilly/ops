@@ -1,4 +1,24 @@
 #!/usr/bin/env ansible-playbook
 ---
+- name: Check for root login
+  hosts: nodes
+  gather_facts: false
+  ignore_unreachable: true
+  vars:
+    ansible_user: root
+  tasks:
+    - name: wait for system to come online
+      wait_for:
+        port: "{{ ansible_port|default(22) }}"
+        host: "{{ ansible_host|default(inventory_hostname) }}"
+        search_regex: ^SSH-2
+        timeout: 600
+      delegate_to: localhost
+    - name: test root login
+      raw: exit 0
+      register: root_login_job
+
 - import_playbook: node-init.yml
+  when: root_login_job.changed
+
 - import_playbook: node-patch.yml

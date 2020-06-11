@@ -15,9 +15,8 @@ cd ansible
 
 This playbook will run all of the steps necessary to configure a
 brand new host to run docker-compose projects. This is the playbook 
-which should be run against any newly provisioned instances. It will
-only succeed the first time it is run since it runs the node-init.yml
-playbook. This playbook will execute the following workflow:
+which should be run against any newly provisioned instances.
+This playbook will execute the following workflow:
 
 - node-init.yml
 - node-patch.yml
