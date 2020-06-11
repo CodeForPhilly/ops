@@ -1,4 +1,4 @@
-# Base cluster provisioning
+# kubernetes/alpha-cluster/ansible
 
 These playbooks are intended to provision a kubernetes cluster up to the point
 at which the [kubernetes contrib playbooks](https://github.com/kubernetes/contrib/tree/master/ansible)

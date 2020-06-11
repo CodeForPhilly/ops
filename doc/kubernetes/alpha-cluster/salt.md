@@ -1,4 +1,4 @@
-# Cluster provisioning
+# kubernetes/alpha-cluster/salt
 
 ## Base cluster provisioning
 

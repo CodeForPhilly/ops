@@ -1,4 +1,4 @@
-# Workstation Resources
+# kubernetes/alpha-cluster/workstation-resources
 
 This directory is a collection of useful (and sometimes necessary) resources
 to be configured on any workstation from which administrative work on the
