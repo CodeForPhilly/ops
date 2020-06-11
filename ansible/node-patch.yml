@@ -1,0 +1,20 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Patch systems
+  hosts: all
+  serial: 1
+  max_fail_percentage: 0
+  become: true
+  tasks:
+
+    - name: upgrade - Arch Linux
+      when: ansible_os_family == 'Archlinux'
+      pacman:
+        update_cache: true
+        upgrade: true
+      register: archlinux_upgrade_job
+
+    - name: reboot system
+      when: >
+        archlinux_upgrade_job.packages|length > 0
+      reboot:

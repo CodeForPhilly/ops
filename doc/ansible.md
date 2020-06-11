@@ -9,10 +9,28 @@ cd ansible
 ../script/console ansible-playbook [playbook-name]
 ```
 
-## node-init.yml
+## Playbooks
 
-This playbook should be run on newly provisioned instances.
-It assumes that the first login must be performed as the root user
-and handles initializing the server's Ansible environment. This
-playbook should only run successfully once, as it will disable
+### onboard-node.yml
+
+This playbook will run all of the steps necessary to configure a
+brand new host to run docker-compose projects. This is the playbook 
+which should be run against any newly provisioned instances. It will
+only succeed the first time it is run since it runs the node-init.yml
+playbook. This playbook will execute the following workflow:
+
+- node-init.yml
+- node-patch.yml
+
+### node-init.yml
+
+This playbook handles initializing a new server's Ansible environment.
+It assumes that the first login must be performed as the root user.
+This playbook should only run successfully once, as it will disable
 root user logins as its final action.
+
+### node-patch.yml
+
+This playbook will perform patching on any hosts it is run against
+and reboot them if they have been patched. It operates on one host
+at a time and fails if there is any failure on the host.

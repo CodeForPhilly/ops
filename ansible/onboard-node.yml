@@ -1,0 +1,4 @@
+#!/usr/bin/env ansible-playbook
+---
+- import_playbook: node-init.yml
+- import_playbook: node-patch.yml
