@@ -6,6 +6,14 @@
   vars:
     ansible_user: root
   tasks:
+    - name: wait for system to come online
+      wait_for:
+        port: "{{ ansible_port|default(22) }}"
+        host: "{{ ansible_host|default(inventory_hostname) }}"
+        search_regex: ^SSH-2
+        timeout: 600
+      delegate_to: localhost
+
     - name: install python
       raw: |
         set -e
@@ -18,12 +26,35 @@
       register: py_install_job
       changed_when: py_install_job.stdout.endswith('status:changed')
 
+    - name: reboot system
+      when: py_install_job.changed
+      raw: sleep 2; systemctl reboot
+      async: 600
+      poll: 0
+      register: reboot_job
+
+    - name: wait for system to go down
+      when: reboot_job.changed
+      wait_for:
+        port: "{{ ansible_port|default(22) }}"
+        host: "{{ ansible_host|default(inventory_hostname) }}"
+        state: absent
+      delegate_to: localhost
+
 - name: 'Initialize ansible environment'
   hosts: all
   gather_facts: false
   vars:
     ansible_user: root
   tasks:
+    - name: wait for system to come online
+      wait_for:
+        port: "{{ ansible_port|default(22) }}"
+        host: "{{ ansible_host|default(inventory_hostname) }}"
+        search_regex: ^SSH-2
+        timeout: 600
+      delegate_to: localhost
+
     - name: create admin user
       raw: |
         set -e
