@@ -1,0 +1,50 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: 'Arch - Initialize ansible environment'
+  hosts: archlinux
+  gather_facts: false
+  remote_user: root
+  tasks:
+    - name: install python
+      raw: |
+        set -e
+        if ! type python; then
+          pacman -Syu --noconfirm python
+          printf 'status:changed'
+        else
+          printf 'status:ok'
+        fi
+      register: py_install_job
+      changed_when: py_install_job.stdout.endswith('status:changed')
+
+    - name: create admin user
+      raw: |
+        set -e
+        if ! [ -e /home/{{ admin_user }} ]; then
+          useradd -Umd /home/{{ admin_user }} -s /bin/bash {{ admin_user }}
+          mkdir /home/{{ admin_user }}/.ssh
+          chmod 700  /home/{{ admin_user }}/.ssh
+          cp -a ~/.ssh/authorized_keys /home/{{ admin_user }}/.ssh/authorized_keys
+          chown -R {{ admin_user }}: /home/{{ admin_user }}
+          cat <<EOF > /etc/sudoers.d/{{ admin_user }}
+        {{ admin_user }} ALL=(ALL) NOPASSWD: ALL
+        EOF
+          printf 'status:changed'
+        else
+          printf 'status:ok'
+        fi
+      register: admin_user_job
+      changed_when: admin_user_job.stdout.endswith('status:changed')
+
+    - name: initialize python environment
+      raw: |
+        set -e
+        if ! [ -e /home/{{ admin_user }}/.python ]; then
+          python -m venv /home/{{ admin_user }}/.python
+          chown -R {{ admin_user }}: /home/{{ admin_user }}
+          printf 'status:changed'
+        else
+          printf 'status:ok'
+        fi
+      register: py_env_job
+      changed_when: py_env_job.stdout.endswith('status:changed')

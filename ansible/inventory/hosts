@@ -1,0 +1,7 @@
+docker-965f  ansible_host=50.116.57.8
+
+[archlinux]
+docker-965f
+
+[workers]
+docker-965f
