@@ -3,7 +3,8 @@
 - name: 'Arch - Install python'
   hosts: archlinux
   gather_facts: false
-  remote_user: root
+  vars:
+    ansible_user: root
   tasks:
     - name: install python
       raw: |
@@ -20,7 +21,8 @@
 - name: 'Initialize ansible environment'
   hosts: all
   gather_facts: false
-  remote_user: root
+  vars:
+    ansible_user: root
   tasks:
     - name: create admin user
       raw: |
