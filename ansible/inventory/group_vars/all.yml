@@ -1,4 +1,5 @@
 admin_user: civic-admin
+admin_venv: /home/{{ admin_user }}/.python
 
 ansible_user: "{{ admin_user }}"
-ansible_python_interpreter: /home/{{ admin_user }}/.python/bin/python
+ansible_python_interpreter: "{{ admin_venv }}/bin/python"

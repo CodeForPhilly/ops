@@ -46,8 +46,8 @@
     - name: initialize python environment
       raw: |
         set -e
-        if ! [ -e /home/{{ admin_user }}/.python ]; then
-          python -m venv /home/{{ admin_user }}/.python
+        if ! [ -e "{{ admin_venv }}" ]; then
+          python -m venv "{{ admin_venv }}"
           chown -R {{ admin_user }}: /home/{{ admin_user }}
           printf 'status:changed'
         else
