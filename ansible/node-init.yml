@@ -1,6 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-- name: 'Arch - Initialize ansible environment'
+- name: 'Arch - Install python'
   hosts: archlinux
   gather_facts: false
   remote_user: root
@@ -17,6 +17,11 @@
       register: py_install_job
       changed_when: py_install_job.stdout.endswith('status:changed')
 
+- name: 'Initialize ansible environment'
+  hosts: all
+  gather_facts: false
+  remote_user: root
+  tasks:
     - name: create admin user
       raw: |
         set -e
