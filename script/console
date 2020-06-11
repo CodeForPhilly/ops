@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd "$(dirname "$0")/.."
+
+. habitat/ops-console/plan.sh
+exec hab pkg exec $pkg_origin/$pkg_name $pkg_name "$@"

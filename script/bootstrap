@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+with_privs()
+{
+  if [ $(id -u) = 0 ]; then
+    "$@"
+  else
+    sudo "$@"
+  fi
+}
+
+cd "$(dirname "$0")/.."
+
+test -n "$(find ~/.hab/cache/keys/ -name 'codeforphilly-*.sig.key')" || hab origin key generate codeforphilly
+
+if [ -e results/last_build.env ]; then
+  . habitat/ops-console/plan.sh
+  . results/last_build.env
+  hab pkg path $pkg_origin/$pkg_name || with_privs hab pkg install results/$pkg_artifact
+else
+  HAB_ORIGIN=codeforphilly hab pkg build habitat/ops-console
+  . results/last_build.env
+  with_privs hab pkg install results/$pkg_artifact
+fi
