@@ -13,4 +13,6 @@ cd ansible
 
 This playbook should be run on newly provisioned instances.
 It assumes that the first login must be performed as the root user
-and handles initializing the server's Ansible environment
+and handles initializing the server's Ansible environment. This
+playbook should only run successfully once, as it will disable
+root user logins as its final action.

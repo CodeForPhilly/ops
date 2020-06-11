@@ -55,3 +55,21 @@
         fi
       register: py_env_job
       changed_when: py_env_job.stdout.endswith('status:changed')
+
+    - name: disable root login
+      vars:
+        sshd_svc: sshd
+        sshd_cfg: /etc/ssh/sshd_config
+      raw: |
+        set -e
+        read opt val <<< $(grep '^PermitRootLogin' {{ sshd_cfg }} || true)
+        if [ -z "$opt" ] || [ "$val" != 'no' ]; then
+          sed -i '/^PermitRootLogin/d' {{ sshd_cfg }}
+          sed -i '$aPermitRootLogin no' {{ sshd_cfg }}
+          systemctl reload {{ sshd_svc }}
+          printf 'status:changed'
+        else
+          printf 'status:ok'
+        fi
+      register: root_login_job
+      changed_when: root_login_job.stdout.endswith('status:changed')
