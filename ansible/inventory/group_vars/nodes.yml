@@ -4,6 +4,7 @@ ansible_python_interpreter: "{{ node_admin_venv }}/bin/python"
 
 node_admin_user: civic-admin
 node_admin_venv: /home/{{ node_admin_user }}/.python
+node_admin_authorized_keys: "{{ playbook_dir }}/../resources/authorized_keys"
 
 node_volstorage_fstype: xfs
 node_volstorage_mountpoint: /mnt/volstorage

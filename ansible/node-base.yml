@@ -15,6 +15,7 @@
         - node_volstorage_mountpoint
         - node_volmount_path
         - node_projects_path
+        - node_admin_authorized_keys
 
     - name: node software installation
       include_tasks: "tasks/node-install-{{ ansible_distribution|lower }}.yml"
@@ -48,3 +49,17 @@
         path: "{{ node_volstorage_mountpoint }}"
         state: mounted
         fstype: "{{ node_volstorage_fstype }}"
+
+
+- name: Configure admin user environment
+  hosts: nodes
+  tasks:
+    - tags:
+        - admin:env
+      block:
+        - name: install authorized_keys file
+          copy:
+            src: "{{ node_admin_authorized_keys }}"
+            dest: ~/.ssh/authorized_keys
+          tags:
+            - admin:env:authkeys
