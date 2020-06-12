@@ -1,0 +1,50 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Install & configure node environment
+  hosts: nodes
+  become: true
+  tasks:
+    - name: validate input vars
+      assert:
+        that: hostvars[inventory_hostname][item] is defined
+        fail_msg: "missing required variable: {{ item }}"
+        success_msg: "{{ item }} is defined"
+      loop:
+        - node_volstorage_device
+        - node_volstorage_fstype
+        - node_volstorage_mountpoint
+        - node_volmount_path
+        - node_projects_path
+
+    - name: node software installation
+      include_tasks: "tasks/node-install-{{ ansible_distribution|lower }}.yml"
+
+    - name: dockerd service
+      vars:
+        dockerd_svc:
+          archlinux: docker
+      service:
+        name: "{{ dockerd_svc[ansible_distribution|lower] }}"
+        state: started
+        enabled: true
+
+    - name: create system directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - "{{ node_volstorage_mountpoint }}"
+        - "{{ node_volmount_path }}"
+        - "{{ node_projects_path }}"
+
+    - name: format persistent storage volume
+      filesystem:
+        dev: "{{ node_volstorage_device }}"
+        fstype: "{{ node_volstorage_fstype }}"
+
+    - name: mount persistent storage volume
+      mount:
+        src: "{{ node_volstorage_device }}"
+        path: "{{ node_volstorage_mountpoint }}"
+        state: mounted
+        fstype: "{{ node_volstorage_fstype }}"

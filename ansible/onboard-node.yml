@@ -22,3 +22,5 @@
   when: root_login_job.changed
 
 - import_playbook: node-patch.yml
+
+- import_playbook: node-base.yml

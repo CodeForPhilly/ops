@@ -1,0 +1,7 @@
+---
+- name: archlinux - install node software
+  pacman:
+    name:
+      - docker
+      - docker-compose
+      - xfsprogs

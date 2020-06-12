@@ -1,5 +1,12 @@
+---
+ansible_user: "{{ node_admin_user }}"
+ansible_python_interpreter: "{{ node_admin_venv }}/bin/python"
+
 node_admin_user: civic-admin
 node_admin_venv: /home/{{ node_admin_user }}/.python
 
-ansible_user: "{{ node_admin_user }}"
-ansible_python_interpreter: "{{ node_admin_venv }}/bin/python"
+node_volstorage_fstype: xfs
+node_volstorage_mountpoint: /mnt/volstorage
+
+node_volmount_path: /srv/volumes
+node_projects_path: /srv/projects
