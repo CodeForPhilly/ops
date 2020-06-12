@@ -20,6 +20,7 @@ This playbook will execute the following workflow:
 
 - node-init.yml
 - node-patch.yml
+- node-base.yml
 
 ### node-init.yml
 
@@ -33,3 +34,9 @@ root user logins as its final action.
 This playbook will perform patching on any hosts it is run against
 and reboot them if they have been patched. It operates on one host
 at a time and fails if there is any failure on the host.
+
+### node-base.yml
+
+This playbook installs the base software and performs the server
+environment configurations needed in order for the node to run
+docker projects.
