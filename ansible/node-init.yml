@@ -58,28 +58,28 @@
     - name: create admin user
       raw: |
         set -e
-        if ! [ -e /home/{{ admin_user }} ]; then
-          useradd -Umd /home/{{ admin_user }} -s /bin/bash {{ admin_user }}
-          mkdir /home/{{ admin_user }}/.ssh
-          chmod 700  /home/{{ admin_user }}/.ssh
-          cp -a ~/.ssh/authorized_keys /home/{{ admin_user }}/.ssh/authorized_keys
-          chown -R {{ admin_user }}: /home/{{ admin_user }}
-          cat <<EOF > /etc/sudoers.d/{{ admin_user }}
-        {{ admin_user }} ALL=(ALL) NOPASSWD: ALL
+        if ! [ -e /home/{{ node_admin_user }} ]; then
+          useradd -Umd /home/{{ node_admin_user }} -s /bin/bash {{ node_admin_user }}
+          mkdir /home/{{ node_admin_user }}/.ssh
+          chmod 700  /home/{{ node_admin_user }}/.ssh
+          cp -a ~/.ssh/authorized_keys /home/{{ node_admin_user }}/.ssh/authorized_keys
+          chown -R {{ node_admin_user }}: /home/{{ node_admin_user }}
+          cat <<EOF > /etc/sudoers.d/{{ node_admin_user }}
+        {{ node_admin_user }} ALL=(ALL) NOPASSWD: ALL
         EOF
           printf 'status:changed'
         else
           printf 'status:ok'
         fi
-      register: admin_user_job
-      changed_when: admin_user_job.stdout.endswith('status:changed')
+      register: node_admin_user_job
+      changed_when: node_admin_user_job.stdout.endswith('status:changed')
 
     - name: initialize python environment
       raw: |
         set -e
-        if ! [ -e "{{ admin_venv }}" ]; then
-          python -m venv "{{ admin_venv }}"
-          chown -R {{ admin_user }}: /home/{{ admin_user }}
+        if ! [ -e "{{ node_admin_venv }}" ]; then
+          python -m venv "{{ node_admin_venv }}"
+          chown -R {{ node_admin_user }}: /home/{{ node_admin_user }}
           printf 'status:changed'
         else
           printf 'status:ok'
