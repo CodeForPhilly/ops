@@ -40,6 +40,16 @@
   vars:
     ansible_user: root
   tasks:
+
+    - name: validate input vars
+      assert:
+        that: hostvars[inventory_hostname][item] is defined
+        fail_msg: "missing required variable: {{ item }}"
+        success_msg: "{{ item }} is defined"
+      loop:
+        - node_admin_user
+        - node_admin_venv
+
     - name: wait for system to come online
       wait_for:
         port: "{{ ansible_port|default(22) }}"
