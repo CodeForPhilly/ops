@@ -6,13 +6,6 @@
   vars:
     ansible_user: root
   tasks:
-    - name: wait for system to come online
-      wait_for:
-        port: "{{ ansible_port|default(22) }}"
-        host: "{{ ansible_host|default(inventory_hostname) }}"
-        search_regex: ^SSH-2
-        timeout: 600
-      delegate_to: localhost
 
     - name: install python
       raw: |
