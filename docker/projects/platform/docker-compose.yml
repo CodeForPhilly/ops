@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+
+  http-router:
+    build: ./http-router
+    volumes:
+      - http-router-config:/usr/local/etc/haproxy
+
+volumes:
+  http-router-config:
