@@ -3,7 +3,7 @@ version: '2'
 services:
 
   http-router:
-    build: ./http-router
+    build: ../../images/haproxy-http-router
     volumes:
       - router-config:/usr/local/etc/haproxy
     networks:
