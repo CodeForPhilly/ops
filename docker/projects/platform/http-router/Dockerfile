@@ -5,7 +5,7 @@ ADD     ./config /usr/local/etc/haproxy
 
 CMD [                                              \
   "haproxy", "-W",                                 \
-  "-f", "/usr/local/etc/haproxy/global.cfg",       \
+  "-f", "/usr/local/etc/haproxy/haproxy.cfg",      \
   "-f", "/usr/local/etc/haproxy/resolvers.cfg",    \
   "-f", "/usr/local/etc/haproxy/frontend.cfg",     \
   "-f", "/usr/local/etc/haproxy/backends"          ]
