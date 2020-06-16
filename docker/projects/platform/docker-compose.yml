@@ -5,7 +5,24 @@ services:
   http-router:
     build: ./http-router
     volumes:
-      - http-router-config:/usr/local/etc/haproxy
+      - router-config:/usr/local/etc/haproxy
+    networks:
+      system:
+    ports:
+      - '${PORT}:80'
+
+  static-http:
+    image: nginx:1.19
+    volumes:
+      - static-data:/usr/share/nginx/html
+    networks:
+      system:
+        aliases:
+          - static-http
 
 volumes:
-  http-router-config:
+  router-config:
+  static-data:
+
+networks:
+  system:
