@@ -24,6 +24,18 @@
         stdin: "{{ project_compose_cfg|to_json }}"
       register: compose_validate_job
 
-    - name: show compose config
+    - name: parse project resources
+      command: "{{ ansible_python.executable }} {{ playbook_dir }}/scripts/parse-project-{{ item }}.py"
+      args:
+        executable: "{{ ansible_python.executable }}"
+        stdin: "{{ project_compose_cfg|to_json }}"
+      register: resource_parse_job
+      loop:
+        - volumes
+
+    - name: show project resource records
       debug:
-        msg: "{{ compose_validate_job.stdout|from_json }}"
+        msg: "{{ item.stdout|from_json }}"
+      loop: "{{ resource_parse_job.results }}"
+      loop_control:
+        label: "{{ item.item }}"
