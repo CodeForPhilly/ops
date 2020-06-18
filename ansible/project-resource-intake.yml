@@ -1,0 +1,29 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Intake project from docker-compose.yml
+  hosts: localhost
+  vars:
+    project_compose_path: "{{ lookup('env', 'COMPOSE_FILE') }}"
+  tasks:
+    - name: set default compose file
+      when: project_compose_path|length == 0
+      set_fact:
+        project_compose_path: docker-compose.yml
+
+    - name: load compose file
+      set_fact:
+        project_compose_cfg: "{{ lookup('file', project_compose_path)|from_yaml }}"
+
+    - name: validate compose file
+      shell: |
+        import sys
+        sys.stdout.write(sys.stdin.read())
+        sys.exit(0)
+      args:
+        executable: "{{ ansible_python.executable }}"
+        stdin: "{{ project_compose_cfg|to_json }}"
+      register: compose_validate_job
+
+    - name: show compose config
+      debug:
+        msg: "{{ compose_validate_job.stdout|from_json }}"
