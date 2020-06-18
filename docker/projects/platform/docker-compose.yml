@@ -9,7 +9,7 @@ services:
     networks:
       system:
     ports:
-      - '${PORT}:80'
+      - '${HTTP_PORT}:80'
 
   static-http:
     image: nginx:1.19
