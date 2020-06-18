@@ -18,7 +18,7 @@ services:
     networks:
       system:
         aliases:
-          - static-http
+          - static-http.system.cloud.domain
 
 volumes:
   router-config:
