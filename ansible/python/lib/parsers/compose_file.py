@@ -51,7 +51,7 @@ class ComposeFileObject:
 
     return items
 
-  def collect_label_items(self, label_pfx, attr_names):
+  def collect_label_maplist(self, label_pfx, attr_names):
     item_labels = self.label_find(label_pfx)
     item_map    = {}
     items       = []
