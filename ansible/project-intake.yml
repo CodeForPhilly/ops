@@ -43,6 +43,7 @@
         dest: "{{ project_repo_path }}"
         version: "{{ project_ref }}"
         depth: 1
+        recursive: false
 
     - name: load compose file
       set_fact:
