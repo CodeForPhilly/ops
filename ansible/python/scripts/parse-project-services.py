@@ -1,32 +1,6 @@
 import sys
 import json
-import parsers
-
-class ComposeFileService(parsers.ComposeFileObject):
-
-  def get_ports(self):
-    return self.data.get('expose', [])
-
-  def get_startup(self):
-    startup = self.label_get('civic-cloud.startup')
-
-    if startup is None:
-      return True
-
-    if startup:
-      return True
-    else:
-      return False
-
-  def container_image(self):
-    return self.data.get('image')
-
-  def container_entrypoint(self):
-    return self.data.get('entrypoint')
-
-  def container_command(self):
-    return self.data.get('command')
-
+import parsers.compose_file
 
 compose_cfg = json.loads(sys.stdin.read())
 services    = []
@@ -41,7 +15,7 @@ if __name__ == '__main__':
 
     if not compose_svc_data:
       compose_svc_data = {}
-    compose_svc = ComposeFileService(compose_svc_name, compose_svc_data)
+    compose_svc = parsers.compose_file.ComposeFileService(compose_svc_name, compose_svc_data)
 
     svc = {
       'name'            : compose_svc.name,
