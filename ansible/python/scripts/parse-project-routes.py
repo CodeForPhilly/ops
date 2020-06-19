@@ -1,6 +1,6 @@
 import sys
 import json
-import parsers.compose_file
+import parsers
 
 compose_cfg = json.loads(sys.stdin.read())
 routes      = []
@@ -10,7 +10,7 @@ if __name__ == '__main__':
   if 'services' in compose_cfg.keys():
     for compose_obj_name, compose_obj_data in compose_cfg['services'].items():
 
-      compose_obj = parsers.compose_file.ComposeFileObject(compose_obj_name, compose_obj_data)
+      compose_obj = parsers.ComposeFileObject(compose_obj_name, compose_obj_data)
       svc_routes  = compose_obj.routes()
 
       for route in svc_routes:

@@ -1,6 +1,6 @@
 import sys
 import json
-import parsers.compose_file
+import parsers
 
 compose_cfg = json.loads(sys.stdin.read())
 services    = []
@@ -13,18 +13,19 @@ if __name__ == '__main__':
 
   for compose_svc_name, compose_svc_data in compose_cfg['services'].items():
 
-    compose_svc = parsers.compose_file.ComposeFileService(compose_svc_name, compose_svc_data)
+    compose_svc          = parsers.ComposeFileObject(compose_svc_name, compose_svc_data)
+    svc_startup          = compose_svc.label_get('civic-cloud.startup')
+    container_image      = compose_svc.label_get('civic-cloud.image', compose_svc.get('image'))
+    container_entrypoint = compose_svc.get('entrypoint')
+    container_command    = compose_svc.get('command')
+
 
     svc = {
       'name'            : compose_svc.name,
-      'ports'           : compose_svc.get_ports(),
-      'startup'         : compose_svc.get_startup(),
+      'ports'           : compose_svc.get('expose', []),
+      'startup'         : svc_startup if svc_startup is not None else True,
       'container_opts'  : {}
     }
-
-    container_image      = compose_svc.container_image()
-    container_entrypoint = compose_svc.container_entrypoint()
-    container_command    = compose_svc.container_command()
 
     if container_image is not None:
       svc['container_opts']['image'] = container_image

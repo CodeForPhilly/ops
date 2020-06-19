@@ -4,16 +4,22 @@ class ComposeFileObject:
     self.data   = cfg_data if cfg_data else {}
     self.labels = self.data.get('labels')
 
-  def label_get(self, label):
+  def get(self, key, default=None):
+    return self.data.get(key, default)
+
+  def __getitem__(self, item):
+    return self.data[item]
+
+  def label_get(self, label, default=None):
 
     if not self.labels:
-      return None
+      return default
 
     for k, v in self.labels.items():
       if k == label:
         return v
 
-    return None
+    return default
 
   def label_find(self, label_pfx):
     matching_labels = []
@@ -100,44 +106,3 @@ class ComposeFileObject:
         items.append(item_map[idx])
 
     return items
-
-
-
-class ComposeFileService(ComposeFileObject):
-
-  def get_ports(self):
-    return self.data.get('expose', [])
-
-  def get_startup(self):
-    startup = self.label_get('civic-cloud.startup')
-
-    if startup is None:
-      return True
-
-    if startup:
-      return True
-    else:
-      return False
-
-  def container_image(self):
-    img = self.label_get('civic-cloud.image')
-
-    if img:
-      return img
-
-    return self.data.get('image')
-
-  def container_entrypoint(self):
-    return self.data.get('entrypoint')
-
-  def container_command(self):
-    return self.data.get('command')
-
-
-
-class ComposeFileVolume(ComposeFileObject):
-
-  def get_size(self):
-    if len(self.label_find('civic-cloud.size',)) > 0:
-      return self.label_get('civic-cloud.size')
-    return ''
