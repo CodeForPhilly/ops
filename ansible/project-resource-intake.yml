@@ -33,6 +33,7 @@
       register: resource_parse_job
       loop:
         - volumes
+        - services
 
     - name: show project resource records
       debug:
