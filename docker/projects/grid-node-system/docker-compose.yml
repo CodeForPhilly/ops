@@ -25,6 +25,9 @@ services:
 
 volumes:
   router-config:
+    labels:
+      civic-cloud.size: 2G
+      civic-cloud.import.src: http-router:/usr/local/etc/haproxy
   static-data:
 
 networks:

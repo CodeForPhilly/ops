@@ -1,0 +1,59 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Intake project from docker-compose.yml
+  hosts: localhost
+  vars:
+    project_name         : system
+    project_compose_file : docker/projects/grid-node-system/docker-compose.yml
+    project_repo_url     : "{{ lookup('env', 'PROJECT_GIT_URL') }}" # REQUIRED
+    project_ref          : "{{ lookup('env', 'PROJECT_GIT_REF') }}" # REQUIRED
+    project_compose_path : "{{ (project_repo_path ~ '/' ~ project_compose_file) | realpath }}"
+    project_repo_path    : "{{ playbook_dir ~ '/project-repos/' ~ project_name }}"
+  tasks:
+    - name: validate input vars
+      assert:
+        that:
+          - project_repo_url |length > 0
+          - project_ref      |length > 0
+        success_msg: required variables ok
+        fail_msg:
+          - 'missing one or more required variables'
+          - 'project_repo_url = {{ project_repo_url }}'
+          - 'project_ref      = {{ project_ref }}'
+
+    - name: clone project
+      when: project_repo_url|length > 0
+      git:
+        repo: "{{ project_repo_url }}"
+        dest: "{{ project_repo_path }}"
+        version: "{{ project_ref }}"
+        depth: 1
+        recursive: false
+
+    - name: load compose file
+      set_fact:
+        project_compose_cfg: "{{ lookup('file', project_compose_path)|from_yaml }}"
+
+    - name: parse compose file
+      include_tasks: tasks/project-parse-docker-compose.yml
+
+    - name: parse system service parameters
+      register: system_svcs_parse_job
+      changed_when: false
+      command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-system-services.py"
+      vars:
+        inputs:
+          project_compose_cfg  : "{{ project_compose_cfg }}"
+          services             : "{{ project_resources['services'] }}"
+      args:
+        stdin: "{{ inputs|to_json }}"
+      environment:
+        PYTHONPATH: "{{ playbook_dir }}/python/lib"
+
+    - name: import system services
+      set_fact:
+        project_resources: "{{ project_resources|combine({ 'services': system_svcs_parse_job.stdout|from_json }) }}"
+
+    - name: show system services
+      debug:
+        var: project_resources
