@@ -16,9 +16,10 @@ if __name__ == '__main__':
     compose_vol = parsers.compose_file.ComposeFileVolume(compose_vol_name, compose_vol_data)
 
     vol = {
-      'name'    : compose_vol.name,
-      'imports' : compose_vol.get_imports(),
-      'size'    : compose_vol.get_size(),
+      'name'     : compose_vol.name,
+      'imports'  : compose_vol.get_imports(),
+      'size'     : compose_vol.get_size(),
+      'bindings' : [],
     }
 
     if vol['size']:
