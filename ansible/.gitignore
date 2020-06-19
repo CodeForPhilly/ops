@@ -1,2 +1,4 @@
 /inventory/local
 /inventory/local.*
+*.pyc
+__pycache__

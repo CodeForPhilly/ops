@@ -1,4 +1,3 @@
 kubernetes/alpha-cluster/ansible/inventory/hosts
 *.retry
 results
-*.pyc
