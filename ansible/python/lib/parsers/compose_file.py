@@ -69,6 +69,38 @@ class ComposeFileObject:
 
     return routes
 
+  def collect_label_items(self, label_pfx, attr_names):
+    item_labels = self.label_find(label_pfx)
+    item_map    = {}
+    items       = []
+
+    if len(item_labels) > 0:
+      for key in item_labels:
+        key_data     = key[len(label_pfx):]
+        key_tokens  = key_data.split('.', 1)
+
+        item_idx   = key_tokens[0]
+        item_attr  = key_tokens[1] if len(key_tokens) > 1 else ''
+
+        for name in attr_names:
+          if item_idx == name:
+            item_idx  = '0'
+            item_attr = name
+
+        item_attr_val = self.label_get(key) if item_attr else ''
+
+        if item_attr not in attr_names: continue
+
+        if item_idx in item_map.keys():
+          item_map[item_idx][item_attr] = item_attr_val
+        else:
+          item_map[item_idx] = { item_attr: item_attr_val }
+
+      for idx in sorted(item_map.keys()):
+        items.append(item_map[idx])
+
+    return items
+
 
 
 class ComposeFileService(ComposeFileObject):
@@ -106,38 +138,7 @@ class ComposeFileService(ComposeFileObject):
 class ComposeFileVolume(ComposeFileObject):
 
   def get_imports(self):
-    import_labels = self.label_find('civic-cloud.import.')
-    import_map    = {}
-    imports       = []
-
-    if len(import_labels) > 0:
-      for key in import_labels:
-        key_data    = key[len('civic-cloud.import.'):]
-        import_data = key_data.split('.', 1)
-
-        import_idx   = import_data[0]
-        import_attr  = import_data[1] if len(import_data) > 1 else ''
-
-        if import_idx == 'src':
-          import_idx  = '0'
-          import_attr = 'src'
-
-        if import_idx == 'destroy':
-          import_idx  = '0'
-          import_attr = 'destroy'
-
-        import_attr_val = self.label_get(key) if import_attr else ''
-
-        if import_attr_val:
-          if import_idx in import_map.keys():
-            import_map[import_idx][import_attr] = import_attr_val
-          else:
-            import_map[import_idx] = { import_attr: import_attr_val }
-
-    for idx in sorted(import_map.keys()):
-      imports.append(import_map[idx])
-
-    return imports
+    return self.collect_label_items('civic-cloud.import.', ('src', 'destroy'))
 
   def get_size(self):
     if len(self.label_find('civic-cloud.size',)) > 0:
