@@ -15,6 +15,8 @@
         project_compose_cfg: "{{ lookup('file', project_compose_path)|from_yaml }}"
 
     - name: validate compose file
+      register: compose_validate_job
+      changed_when: false
       shell: |
         import sys
         sys.stdout.write(sys.stdin.read())
@@ -22,15 +24,15 @@
       args:
         executable: "{{ ansible_python.executable }}"
         stdin: "{{ project_compose_cfg|to_json }}"
-      register: compose_validate_job
 
     - name: parse project resources
+      register: resource_parse_job
+      changed_when: false
       command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/parse-project-{{ item }}.py"
       args:
         stdin: "{{ project_compose_cfg|to_json }}"
       environment:
         PYTHONPATH: "{{ playbook_dir }}/python/lib"
-      register: resource_parse_job
       loop:
         - volumes
         - services
