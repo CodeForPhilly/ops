@@ -11,7 +11,7 @@ services:
     ports:
       - '${HTTP_PORT}:80'
     labels:
-      civic-cloud.route.0: example.net/foo/
+      civic-cloud.route: example.net/foo/
       civic-cloud.route.1: example.org/foo/
 
   static-http:
@@ -35,9 +35,13 @@ volumes:
       civic-cloud.size: 2G
       civic-cloud.route: example.com
   static-data:
-      civic-cloud.import.src: http-router:/usr/local/etc/haproxy
-      civic-cloud.import.1.src: http-router:/usr/local/etc/haproxy
+    labels:
+      civic-cloud.size: 8G
+      civic-cloud.import.src: static-http:/usr/share/nginx/html
+      civic-cloud.import.1.src: https://example.com/overlay.zip
       civic-cloud.import.1.destroy: true
+  ignored-vol:
+    civic-cloud.route: example.net
 
 networks:
   system:
