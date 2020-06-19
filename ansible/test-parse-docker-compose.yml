@@ -1,0 +1,22 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Intake project from docker-compose.yml
+  hosts: localhost
+  vars:
+    project_repo_url     : "{{ (playbook_dir ~ '/..')|realpath }}/.git"
+    project_ref          : HEAD
+    project_name         : myproject
+    project_compose_file : ansible/test/parser-compose-file.yml
+    project_compose_path : "{{ (project_repo_path ~ '/' ~ project_compose_file) | realpath }}"
+    project_repo_path    : "{{ project_repo_url|dirname }}"
+  tasks:
+    - name: load compose file
+      set_fact:
+        project_compose_cfg: "{{ lookup('file', project_compose_path)|from_yaml }}"
+
+    - name: parse compose file
+      include_tasks: tasks/project-parse-docker-compose.yml
+
+    - name: show project resource records
+      debug:
+        var: project_resources

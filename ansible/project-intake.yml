@@ -50,7 +50,3 @@
 
     - name: parse compose file
       include_tasks: tasks/project-parse-docker-compose.yml
-
-    - name: show project resource records
-      debug:
-        var: project_resources
