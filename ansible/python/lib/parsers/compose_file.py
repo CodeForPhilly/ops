@@ -1,7 +1,7 @@
 class ComposeFileObject:
   def __init__(self, cfg_name, cfg_data):
     self.name   = cfg_name
-    self.data   = cfg_data
+    self.data   = cfg_data if cfg_data else {}
     self.labels = self.data.get('labels')
 
   def label_get(self, label):

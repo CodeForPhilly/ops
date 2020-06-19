@@ -13,8 +13,6 @@ if __name__ == '__main__':
 
   for compose_vol_name, compose_vol_data in compose_cfg['volumes'].items():
 
-    if not compose_vol_data:
-      compose_vol_data = {}
     compose_vol = parsers.compose_file.ComposeFileVolume(compose_vol_name, compose_vol_data)
 
     vol = {

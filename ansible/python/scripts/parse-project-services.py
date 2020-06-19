@@ -13,8 +13,6 @@ if __name__ == '__main__':
 
   for compose_svc_name, compose_svc_data in compose_cfg['services'].items():
 
-    if not compose_svc_data:
-      compose_svc_data = {}
     compose_svc = parsers.compose_file.ComposeFileService(compose_svc_name, compose_svc_data)
 
     svc = {
