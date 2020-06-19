@@ -27,6 +27,48 @@ class ComposeFileObject:
 
     return matching_labels
 
+  def routes(self):
+    labels = self.label_find('civic-cloud.route')
+    route_map = {}
+    routes = []
+
+    for label in labels:
+      route_idx = label.rsplit('.', 1)[1]
+      if route_idx == 'route':
+        route_idx = '0'
+
+      route_raw  = self.label_get(label)
+      route_data = route_raw.rsplit(':', 1)
+      route_addr = route_data[0]
+
+      if len(route_data) > 1:
+        route_tgt_port = route_data[1]
+      else:
+        route_tgt_port = self.data.get('expose', ['80'])[0]
+
+      route_path_boundary = route_addr.find('/')
+
+      if route_path_boundary >= 0:
+        route_host = route_addr[:route_path_boundary]
+        route_path = route_addr[route_path_boundary:]
+      else:
+        route_host = route_addr
+        route_path = '/'
+
+      route_map[route_idx] = {
+        'host': route_host,
+        'path': route_path,
+        'binding': {
+          'target': self.name,
+          'port': route_tgt_port,
+        }
+      }
+
+    for idx in sorted(route_map.keys()):
+      routes.append(route_map[idx])
+
+    return routes
+
 
 
 class ComposeFileService(ComposeFileObject):
