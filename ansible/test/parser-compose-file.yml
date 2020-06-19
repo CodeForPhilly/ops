@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+
+  http-router:
+    build: ../../images/haproxy-http-router
+    volumes:
+      - router-config:/usr/local/etc/haproxy
+    networks:
+      system:
+    ports:
+      - '${HTTP_PORT}:80'
+
+  static-http:
+    image: nginx:1.19
+    volumes:
+      - static-data:/usr/share/nginx/html
+    networks:
+      system:
+        aliases:
+          - static-http.system.domain
+
+volumes:
+  router-config:
+    labels:
+      civic-cloud.import.src: http-router:/usr/local/etc/haproxy
+      civic-cloud.size: 2G
+      civic-cloud.route: example.com
+  static-data:
+
+networks:
+  system:
