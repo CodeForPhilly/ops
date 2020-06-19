@@ -133,15 +133,9 @@ class ComposeFileService(ComposeFileObject):
   def container_command(self):
     return self.data.get('command')
 
-  def system_ports(self):
-    return self.collect_label_items('civic-cloud.system.port.', ('node', 'service'))
-
 
 
 class ComposeFileVolume(ComposeFileObject):
-
-  def get_imports(self):
-    return self.collect_label_items('civic-cloud.import.', ('src', 'destroy'))
 
   def get_size(self):
     if len(self.label_find('civic-cloud.size',)) > 0:

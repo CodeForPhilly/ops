@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     vol = {
       'name'     : compose_vol.name,
-      'imports'  : compose_vol.get_imports(),
+      'imports'  : compose_vol.collect_label_items('civic-cloud.import.', ('src', 'destroy')),
       'size'     : compose_vol.get_size(),
       'bindings' : [],
     }
