@@ -82,6 +82,23 @@
       loop_control:
         label: "{{ resource_type }}"
 
+    - name: populate service grid names
+      register: svc_gridnames_job
+      changed_when: false
+      command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-servivce-gridnames.py"
+      vars:
+        inputs:
+          project_name: "{{ project_name }}"
+          services: "{{ project_resources['services'] }}"
+      args:
+        stdin: "{{ inputs|to_json }}"
+      environment:
+        PYTHONPATH: "{{ playbook_dir }}/python/lib"
+
+    - name: load service grid names
+      set_fact:
+        project_resources: "{{ project_resources|combine({ 'services': svc_gridnames_job.stdout|from_json }) }}"
+
     - name: show project resource records
       debug:
         var: project_resources
