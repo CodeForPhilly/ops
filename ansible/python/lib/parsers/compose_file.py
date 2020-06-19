@@ -33,47 +33,23 @@ class ComposeFileObject:
 
     return matching_labels
 
-  def routes(self):
-    labels = self.label_find('civic-cloud.route')
-    route_map = {}
-    routes = []
+  def collect_label_list(self, label_pfx):
+    labels = self.label_find(label_pfx)
+    item_map = {}
+    items = []
 
     for label in labels:
-      route_idx = label.rsplit('.', 1)[1]
-      if route_idx == 'route':
-        route_idx = '0'
+      item_idx = label.rsplit('.', 1)[1]
 
-      route_raw  = self.label_get(label)
-      route_data = route_raw.rsplit(':', 1)
-      route_addr = route_data[0]
+      if item_idx == label_pfx.rsplit('.', 1)[-1]:
+        item_idx = '0'
 
-      if len(route_data) > 1:
-        route_tgt_port = route_data[1]
-      else:
-        route_tgt_port = self.data.get('expose', ['80'])[0]
+      item_map[item_idx] = self.label_get(label)
 
-      route_path_boundary = route_addr.find('/')
+    for idx in sorted(item_map.keys()):
+      items.append(item_map[idx])
 
-      if route_path_boundary >= 0:
-        route_host = route_addr[:route_path_boundary]
-        route_path = route_addr[route_path_boundary:]
-      else:
-        route_host = route_addr
-        route_path = '/'
-
-      route_map[route_idx] = {
-        'host': route_host,
-        'path': route_path,
-        'binding': {
-          'target': self.name,
-          'port': route_tgt_port,
-        }
-      }
-
-    for idx in sorted(route_map.keys()):
-      routes.append(route_map[idx])
-
-    return routes
+    return items
 
   def collect_label_items(self, label_pfx, attr_names):
     item_labels = self.label_find(label_pfx)
@@ -106,3 +82,37 @@ class ComposeFileObject:
         items.append(item_map[idx])
 
     return items
+
+  def routes(self):
+
+    routes     = []
+    routes_raw = self.collect_label_list('civic-cloud.route')
+
+    for raw in routes_raw:
+      route_tokens = raw.rsplit(':', 1)
+      route_addr   = route_tokens[0]
+
+      if len(route_tokens) > 1:
+        route_tgt_port = route_tokens[1]
+      else:
+        route_tgt_port = self.data.get('expose', ['80'])[0]
+
+      route_path_boundary = route_addr.find('/')
+
+      if route_path_boundary >= 0:
+        route_host = route_addr[:route_path_boundary]
+        route_path = route_addr[route_path_boundary:]
+      else:
+        route_host = route_addr
+        route_path = '/'
+
+      routes.append({
+        'host': route_host,
+        'path': route_path,
+        'binding': {
+          'target': self.name,
+          'port': route_tgt_port,
+        }
+      })
+
+    return routes
