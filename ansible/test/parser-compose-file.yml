@@ -10,15 +10,23 @@ services:
       system:
     ports:
       - '${HTTP_PORT}:80'
+    labels:
+      civic-cloud.route.0: example.net/foo/
+      civic-cloud.route.1: example.org/foo/
 
   static-http:
     image: nginx:1.19
     volumes:
       - static-data:/usr/share/nginx/html
+    expose:
+      - 443
     networks:
       system:
         aliases:
           - static-http.system.domain
+    labels:
+      civic-cloud.route.0: example.net/bar/
+      civic-cloud.route.1: example.org/bar/:80
 
 volumes:
   router-config:
@@ -27,6 +35,9 @@ volumes:
       civic-cloud.size: 2G
       civic-cloud.route: example.com
   static-data:
+      civic-cloud.import.src: http-router:/usr/local/etc/haproxy
+      civic-cloud.import.1.src: http-router:/usr/local/etc/haproxy
+      civic-cloud.import.1.destroy: true
 
 networks:
   system:
