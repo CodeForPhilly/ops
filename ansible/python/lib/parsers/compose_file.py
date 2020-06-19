@@ -88,6 +88,11 @@ class ComposeFileService(ComposeFileObject):
       return False
 
   def container_image(self):
+    img = self.label_get('civic-cloud.image')
+
+    if img:
+      return img
+
     return self.data.get('image')
 
   def container_entrypoint(self):
