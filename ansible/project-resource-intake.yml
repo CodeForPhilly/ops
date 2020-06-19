@@ -121,6 +121,23 @@
       set_fact:
         project_resources: "{{ project_resources|combine({ 'services': svc_buildinfo_job.stdout|from_json }) }}"
 
+    - name: parse volume bindings
+      register: vol_bindings_job
+      changed_when: false
+      command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-volume-bindings.py"
+      vars:
+        inputs:
+          project_compose_cfg  : "{{ project_compose_cfg }}"
+          volumes              : "{{ project_resources['volumes'] }}"
+      args:
+        stdin: "{{ inputs|to_json }}"
+      environment:
+        PYTHONPATH: "{{ playbook_dir }}/python/lib"
+
+    - name: import volume bindings
+      set_fact:
+        project_resources: "{{ project_resources|combine({ 'volumes': vol_bindings_job.stdout|from_json }) }}"
+
     - name: show project resource records
       debug:
         var: project_resources
