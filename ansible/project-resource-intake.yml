@@ -3,12 +3,46 @@
 - name: Intake project from docker-compose.yml
   hosts: localhost
   vars:
-    project_compose_path: "{{ lookup('env', 'COMPOSE_FILE') }}"
+    project_repo_url     : "{{ lookup('env', 'PROJECT_GIT_URL') }}" # REQUIRED
+    project_ref          : "{{ lookup('env', 'PROJECT_GIT_REF') }}" # REQUIRED
+    project_name         : "{{ lookup('env', 'PROJECT_NAME') }}"
+    project_compose_file : "{{ lookup('env', 'COMPOSE_FILE') }}"
+    project_compose_path : "{{ (project_repo_path ~ '/' ~ project_compose_file) | realpath }}"
+    project_repo_path    : "{{ playbook_dir ~ '/project-repos/' ~ project_name }}"
   tasks:
+    - name: validate input vars
+      assert:
+        that:
+          - project_repo_url |length > 0
+          - project_ref      |length > 0
+        success_msg: required variables ok
+        fail_msg:
+          - 'missing one or more required variables'
+          - 'project_repo_url = {{ project_repo_url }}'
+          - 'project_ref      = {{ project_ref }}'
+
     - name: set default compose file
-      when: project_compose_path|length == 0
+      when: project_compose_file|length == 0
       set_fact:
-        project_compose_path: docker-compose.yml
+        project_compose_file: docker-compose.yml
+
+    - name: set default project name
+      when: project_name|length == 0
+      set_fact:
+        project_name: >-
+          {% if project_repo_url|basename == '.git' -%}
+          {{ project_repo_url|dirname|basename }}
+          {%- else -%}
+          {{ project_repo_url|basename|regex_replace('(.*)\.git', '\1') }}
+          {%- endif %}
+
+    - name: clone project
+      when: project_repo_url|length > 0
+      git:
+        repo: "{{ project_repo_url }}"
+        dest: "{{ project_repo_path }}"
+        version: "{{ project_ref }}"
+        depth: 1
 
     - name: load compose file
       set_fact:
@@ -38,9 +72,16 @@
         - services
         - routes
 
-    - name: show project resource records
-      debug:
-        msg: "{{ item.stdout|from_json }}"
+    - name: import project resources
+      vars:
+        resource_type: "{{ item.item }}"
+        resource_list: "{{ item.stdout|from_json }}"
+      set_fact:
+        project_resources: "{{ project_resources|default({})|combine({ resource_type: resource_list }) }}"
       loop: "{{ resource_parse_job.results }}"
       loop_control:
-        label: "{{ item.item }}"
+        label: "{{ resource_type }}"
+
+    - name: show project resource records
+      debug:
+        var: project_resources
