@@ -47,6 +47,11 @@ compose_cfg = json.loads(sys.stdin.read())
 volumes     = []
 
 if __name__ == '__main__':
+
+  if 'volumes' not in compose_cfg.keys():
+    sys.stdout.write('[]')
+    sys.exit(0)
+
   for compose_vol_name, compose_vol_data in compose_cfg['volumes'].items():
 
     if not compose_vol_data:
