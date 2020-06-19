@@ -58,7 +58,7 @@ class ComposeFileObject:
 
     if len(item_labels) > 0:
       for key in item_labels:
-        key_data     = key[len(label_pfx):]
+        key_data    = key[len(label_pfx):]
         key_tokens  = key_data.split('.', 1)
 
         item_idx   = key_tokens[0]
