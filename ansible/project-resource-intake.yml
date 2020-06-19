@@ -85,7 +85,7 @@
     - name: populate service grid names
       register: svc_gridnames_job
       changed_when: false
-      command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-servivce-gridnames.py"
+      command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-service-gridnames.py"
       vars:
         inputs:
           project_name: "{{ project_name }}"
@@ -102,7 +102,7 @@
     - name: parse service container build instructions
       register: svc_buildinfo_job
       changed_when: false
-      command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-servivce-buildinfo.py"
+      command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-service-buildinfo.py"
       vars:
         inputs:
           project_name         : "{{ project_name }}"
