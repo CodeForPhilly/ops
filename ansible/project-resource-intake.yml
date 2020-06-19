@@ -25,10 +25,11 @@
       register: compose_validate_job
 
     - name: parse project resources
-      command: "{{ ansible_python.executable }} {{ playbook_dir }}/scripts/parse-project-{{ item }}.py"
+      command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/parse-project-{{ item }}.py"
       args:
-        executable: "{{ ansible_python.executable }}"
         stdin: "{{ project_compose_cfg|to_json }}"
+      environment:
+        PYTHONPATH: "{{ playbook_dir }}/python/lib"
       register: resource_parse_job
       loop:
         - volumes
