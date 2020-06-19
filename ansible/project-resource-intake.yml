@@ -95,9 +95,31 @@
       environment:
         PYTHONPATH: "{{ playbook_dir }}/python/lib"
 
-    - name: load service grid names
+    - name: import service grid names
       set_fact:
         project_resources: "{{ project_resources|combine({ 'services': svc_gridnames_job.stdout|from_json }) }}"
+
+    - name: parse service container build instructions
+      register: svc_buildinfo_job
+      changed_when: false
+      command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-servivce-buildinfo.py"
+      vars:
+        inputs:
+          project_name         : "{{ project_name }}"
+          project_repo_url     : "{{ project_repo_url }}"
+          project_repo_path    : "{{ project_repo_path }}"
+          project_ref          : "{{ project_ref }}"
+          project_compose_file : "{{ project_compose_file }}"
+          project_compose_cfg  : "{{ project_compose_cfg }}"
+          services             : "{{ project_resources['services'] }}"
+      args:
+        stdin: "{{ inputs|to_json }}"
+      environment:
+        PYTHONPATH: "{{ playbook_dir }}/python/lib"
+
+    - name: import service container build instructions
+      set_fact:
+        project_resources: "{{ project_resources|combine({ 'services': svc_buildinfo_job.stdout|from_json }) }}"
 
     - name: show project resource records
       debug:
