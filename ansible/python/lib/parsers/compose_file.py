@@ -82,37 +82,3 @@ class ComposeFileObject:
         items.append(item_map[idx])
 
     return items
-
-  def routes(self):
-
-    routes     = []
-    routes_raw = self.collect_label_list('civic-cloud.route')
-
-    for raw in routes_raw:
-      route_tokens = raw.rsplit(':', 1)
-      route_addr   = route_tokens[0]
-
-      if len(route_tokens) > 1:
-        route_tgt_port = route_tokens[1]
-      else:
-        route_tgt_port = self.data.get('expose', ['80'])[0]
-
-      route_path_boundary = route_addr.find('/')
-
-      if route_path_boundary >= 0:
-        route_host = route_addr[:route_path_boundary]
-        route_path = route_addr[route_path_boundary:]
-      else:
-        route_host = route_addr
-        route_path = '/'
-
-      routes.append({
-        'host': route_host,
-        'path': route_path,
-        'binding': {
-          'target': self.name,
-          'port': route_tgt_port,
-        }
-      })
-
-    return routes
