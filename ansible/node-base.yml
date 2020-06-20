@@ -3,6 +3,10 @@
 - name: Install & configure node environment
   hosts: nodes
   become: true
+  vars:
+    dockerd_svc:
+      archlinux: docker
+    node_systemdb_path: /var/lib/system.db
   tasks:
     - name: validate input vars
       assert:
@@ -20,10 +24,16 @@
     - name: node software installation
       include_tasks: "tasks/node-install-{{ ansible_distribution|lower }}.yml"
 
+    - name: dockerd configuration
+      notify: reload dockerd
+      copy:
+        dest: /etc/docker/daemon.json
+        content: |
+          {
+            "ipv6": true
+          }
+
     - name: dockerd service
-      vars:
-        dockerd_svc:
-          archlinux: docker
       service:
         name: "{{ dockerd_svc[ansible_distribution|lower] }}"
         state: started
@@ -50,6 +60,23 @@
         state: mounted
         fstype: "{{ node_volstorage_fstype }}"
 
+    - name: initialize system database
+      shell: |
+        {{ lookup('file', playbook_dir ~ '/python/scripts/system-db-init.py') }}
+      vars:
+        inputs:
+          db_path: "{{ node_systemdb_path }}"
+      args:
+        executable: "{{ ansible_python.executable }}"
+        creates: "{{ node_systemdb_path }}"
+        stdin: "{{ inputs|to_json }}"
+
+  handlers:
+
+    - name: reload dockerd
+      service:
+        name: "{{ dockerd_svc[ansible_distribution|lower] }}"
+        state: reloaded
 
 - name: Configure admin user environment
   hosts: nodes
