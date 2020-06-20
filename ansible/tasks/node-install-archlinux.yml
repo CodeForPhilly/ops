@@ -3,5 +3,4 @@
   pacman:
     name:
       - docker
-      - docker-compose
       - xfsprogs
