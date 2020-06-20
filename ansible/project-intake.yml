@@ -50,4 +50,7 @@
         project_compose_cfg: "{{ lookup('file', project_compose_path)|from_yaml }}"
 
     - name: parse compose file
-      include_tasks: tasks/project-parse-docker-compose.yml
+      import_tasks: tasks/project-parse-docker-compose.yml
+
+    - name: dump project resources
+      import_tasks: tasks/project-dump-resources.yml
