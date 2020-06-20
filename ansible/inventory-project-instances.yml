@@ -62,14 +62,20 @@
     - name: generate project instances inventory group
       vars:
         project_name: "{{ item[0].project }}"
-        placement_host: "{{ item[1] }}"
+        placement_host: "{{ item[1].host }}"
+        svc_replicas: "{{ item[1].replicas }}"
+        project_instance: "{{ project_name }}.{{ placement_host }}"
       add_host:
-        name: "{{ project_name }}.{{ placement_host }}"
+        name: "{{ project_instance }}"
         groups:
           - project_instances
         ansible_host: "{{ hostvars[placement_host]['ansible_host']|default(placement_host) }}"
         project_services: "{{ project_services[project_name] }}"
         project_volumes: "{{ project_volumes[project_name] }}"
         project_routes: "{{ project_routes[project_name] }}"
+        project_replicas: "{{ svc_replicas }}"
 
       loop: "{{ lookup('subelements', project_placements, 'placement', wantlist=True) }}"
+      loop_control:
+        label: "{{ project_instance }}"
+      changed_when: false
