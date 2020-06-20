@@ -13,12 +13,20 @@ if __name__ == '__main__':
 
   for compose_vol_name, compose_vol_data in compose_cfg['volumes'].items():
 
-    compose_vol = parsers.ComposeFileObject(compose_vol_name, compose_vol_data)
+    compose_vol    = parsers.ComposeFileObject(compose_vol_name, compose_vol_data)
+    vol_size       = compose_vol.label_get('civic-cloud.size')
+    import_srcs    = compose_vol.collect_label_list('civic-cloud.import.src')
+    import_destroy = compose_vol.label_get('civic-cloud.import.destroy')
+    import_prune   = compose_vol.collect_label_list('civic-cloud.import.prune')
 
     vol = {
       'name'     : compose_vol.name,
-      'imports'  : compose_vol.collect_label_maplist('civic-cloud.import.', ('src', 'destroy')),
-      'size'     : compose_vol.label_get('civic-cloud.size'),
+      'import'   : {
+        'srcs'        : import_srcs,
+        'destroy'     : import_destroy if import_destroy else False,
+        'prune_paths' : import_prune,
+      },
+      'size'     : vol_size,
       'bindings' : [],
     }
 
