@@ -1,0 +1,75 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Build project instances group
+  hosts: localhost
+  vars:
+    project_records_dir: "{{ playbook_dir }}/project-records"
+  tasks:
+
+    - name: load project services
+      register: load_svcs_job
+      vars:
+        records_load_dir: "{{ project_records_dir }}/{{ item }}"
+      set_fact:
+        project_services: >-
+          {{
+            project_services|default({})|
+            combine({
+              item: lookup('file', records_load_dir ~ '/services.yml')|from_yaml
+            })
+          }}
+      loop: "{{ groups['projects'] }}"
+
+    - name: load project volumes
+      register: load_vols_job
+      vars:
+        records_load_dir: "{{ project_records_dir }}/{{ item }}"
+      set_fact:
+        project_volumes: >-
+          {{
+            project_volumes|default({})|
+            combine({
+              item: lookup('file', records_load_dir ~ '/volumes.yml')|from_yaml
+            })
+          }}
+      loop: "{{ groups['projects'] }}"
+
+    - name: load project routes
+      register: load_routes_job
+      vars:
+        records_load_dir: "{{ project_records_dir }}/{{ item }}"
+      set_fact:
+        project_routes: >-
+          {{
+            project_routes|default({})|
+            combine({
+              item: lookup('file', records_load_dir ~ '/routes.yml')|from_yaml
+            })
+          }}
+      loop: "{{ groups['projects'] }}"
+
+    - name: get project placement lists
+      when: hostvars[item]['project_placement'] is defined
+      set_fact:
+        project_placements: >-
+          {{
+              (project_placements|default([])) + [
+                { 'project': item, 'placement': hostvars[item]['project_placement'] }
+              ]
+          }}
+      loop: "{{ groups['projects'] }}"
+
+    - name: generate project instances inventory group
+      vars:
+        project_name: "{{ item[0].project }}"
+        placement_host: "{{ item[1] }}"
+      add_host:
+        name: "{{ project_name }}.{{ placement_host }}"
+        groups:
+          - project_instances
+        ansible_host: "{{ hostvars[placement_host]['ansible_host']|default(placement_host) }}"
+        project_services: "{{ project_services[project_name] }}"
+        project_volumes: "{{ project_volumes[project_name] }}"
+        project_routes: "{{ project_routes[project_name] }}"
+
+      loop: "{{ lookup('subelements', project_placements, 'placement', wantlist=True) }}"
