@@ -29,7 +29,7 @@ if __name__ == '__main__':
     supernets.reverse()
 
     if len(supernets) == 0:
-        sys.stderr.write(json.dumps({'msg': 'unable to allocate /{} subnet: network exhaustion'.format(subnet_pfxlen)}))
+        sys.stderr.write('unable to allocate /{} subnet: network exhaustion'.format(subnet_pfxlen))
         sys.exit(1)
 
     i     = 0
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         try:
             block = supernets[i]
         except IndexError:
-            sys.stderr.write(json.dumps({'msg': 'unable to allocate /{} subnet: no available supernets'.format(subnet_pfxlen)}))
+            sys.stderr.write('unable to allocate /{} subnet: no available supernets'.format(subnet_pfxlen))
             sys.exit(1)
 
 
