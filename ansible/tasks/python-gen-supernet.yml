@@ -1,0 +1,19 @@
+# Inputs:
+# new_supernet_pfxlen
+#
+# Outputs:
+# new_supernet
+---
+- name: generate new supernet
+  register: supernet_gen_job
+  command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/gen-supernet.py"
+  vars:
+    inputs:
+      pfxlen: "{{ new_supernet_pfxlen }}"
+  args:
+    stdin: "{{ inputs|to_json }}"
+  changed_when: false
+
+- name: register generated supernet
+  set_fact:
+    new_supernet: "{{ supernet_gen_job.stdout }}"

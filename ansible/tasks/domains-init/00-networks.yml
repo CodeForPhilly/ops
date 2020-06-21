@@ -1,0 +1,79 @@
+---
+- name: system supernet
+  when: node_domains['system']['network'] is not defined
+  block:
+
+    - name: generate system supernet
+      vars:
+        new_supernet_pfxlen: 48
+      import_tasks: tasks/python-gen-supernet.yml
+
+    - name: register system supernet
+      register: system_supernet_set_job
+      changed_when: new_supernet is defined
+      set_fact:
+        node_domains: >-
+          {{
+              node_domains                         |
+              combine({
+                'system': node_domains['system']   |
+                combine({ 'network': new_supernet })
+              })
+          }}
+
+- name: node supernet
+  when: node_domains['node']['network'] is not defined
+  block:
+
+    - name: generate node supernet
+      register: gen_node_supernet_tasks
+      vars:
+        new_supernet_pfxlen: 48
+      import_tasks: tasks/python-gen-supernet.yml
+
+    - name: register node supernet
+      changed_when: new_supernet is defined
+      register: node_supernet_set_job
+      set_fact:
+        node_domains: >-
+          {{
+              node_domains                         |
+              combine({
+                'node': node_domains['node']   |
+                combine({ 'network': new_supernet })
+              })
+          }}
+
+- name: commit system supernet
+  when: system_supernet_set_job.changed
+  shell: |
+    import sys, sqlite3
+    db = sqlite3.connect('{{ node_systemdb_path }}')
+    db.executescript('''
+
+      insert into system_domain (attribute, value)
+      values ("network", "{{ node_domains['system']['network'] }}")
+
+    ''')
+    db.commit()
+    db.close()
+    sys.exit(0)
+  args:
+    executable: "{{ ansible_python.executable }}"
+
+- name: commit node supernet
+  when: node_supernet_set_job.changed
+  shell: |
+    import sys, sqlite3
+    db = sqlite3.connect('{{ node_systemdb_path }}')
+    db.executescript('''
+
+      insert into node_domain (attribute, value)
+      values ("network", "{{ node_domains['node']['network'] }}")
+
+    ''')
+    db.commit()
+    db.close()
+    sys.exit(0)
+  args:
+    executable: "{{ ansible_python.executable }}"

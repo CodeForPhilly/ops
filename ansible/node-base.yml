@@ -59,9 +59,6 @@
         state: mounted
         fstype: "{{ node_volstorage_fstype }}"
 
-    - name: init systemdb
-      import_tasks: tasks/python-system-db-init.yml
-
   handlers:
 
     - name: reload dockerd

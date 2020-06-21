@@ -1,0 +1,44 @@
+---
+- name: node id
+  when: node_domains['node']['id'] is not defined
+  block:
+
+    - name: create node id
+      register: node_id_create_job
+      shell: |
+        import sys, ipaddress, math
+        node_net       = ipaddress.IPv6Network('{{ node_domains['node']['network'] }}')
+        node_net_bytes = int(node_net.network_address).to_bytes(16, 'big')
+        node_net_pfxid = node_net_bytes[:math.ceil(node_net.prefixlen / 8)][1:]
+        sys.stdout.write(node_net_pfxid.hex())
+        sys.exit(0)
+      args:
+        executable: "{{ ansible_python.executable }}"
+
+    - name: register node id
+      set_fact:
+        node_domains: >-
+          {{
+              node_domains                         |
+              combine({
+                'node': node_domains['node']   |
+                combine({ 'id': node_id_create_job.stdout })
+              })
+          }}
+
+- name: commit node id
+  when: node_id_create_job.changed
+  shell: |
+    import sys, sqlite3
+    db = sqlite3.connect('{{ node_systemdb_path }}')
+    db.executescript('''
+
+      insert into node_domain (attribute, value)
+      values ("id", "{{ node_domains['node']['id'] }}")
+
+    ''')
+    db.commit()
+    db.close()
+    sys.exit(0)
+  args:
+    executable: "{{ ansible_python.executable }}"

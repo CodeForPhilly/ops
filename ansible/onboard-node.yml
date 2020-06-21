@@ -24,3 +24,4 @@
 - import_playbook: node-patch.yml
 
 - import_playbook: node-base.yml
+- import_playbook: node-base-systemdb.yml
