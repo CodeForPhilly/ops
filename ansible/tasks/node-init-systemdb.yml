@@ -1,0 +1,13 @@
+# Inputs:
+# node_systemdb_path
+---
+- name: initialize system database
+  shell: |
+    {{ lookup('file', playbook_dir ~ '/python/scripts/system-db-init.py') }}
+  vars:
+    inputs:
+      db_path: "{{ node_systemdb_path }}"
+  args:
+    executable: "{{ ansible_python.executable }}"
+    creates: "{{ node_systemdb_path }}"
+    stdin: "{{ inputs|to_json }}"

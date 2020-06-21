@@ -60,16 +60,8 @@
         state: mounted
         fstype: "{{ node_volstorage_fstype }}"
 
-    - name: initialize system database
-      shell: |
-        {{ lookup('file', playbook_dir ~ '/python/scripts/system-db-init.py') }}
-      vars:
-        inputs:
-          db_path: "{{ node_systemdb_path }}"
-      args:
-        executable: "{{ ansible_python.executable }}"
-        creates: "{{ node_systemdb_path }}"
-        stdin: "{{ inputs|to_json }}"
+    - name: init systemdb
+      import_tasks: tasks/node-init-systemdb.yml
 
   handlers:
 

@@ -1,0 +1,7 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: localhost
+  vars:
+    node_systemdb_path: /tmp/system.db
+  tasks:
+    - import_tasks: tasks/node-init-systemdb.yml

@@ -1,0 +1,16 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: localhost
+  vars:
+    node_systemdb_path: /tmp/system.db
+    project_subnet_pfxlen: 96
+  tasks:
+
+    - import_tasks: tasks/node-load-network.yml
+
+    - import_tasks: tasks/project-gen-subnet.yml
+      vars:
+        node_network: "{{ nodenet_load_job.stdout }}"
+
+    - debug:
+        var: projnet_gen_job.stdout

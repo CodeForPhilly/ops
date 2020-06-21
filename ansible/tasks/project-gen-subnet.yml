@@ -1,0 +1,16 @@
+# Inputs:
+# node_systemdb_path
+# node_network
+# project_subnet_pfxlen
+---
+- name: generate project subnet
+  register: projnet_gen_job
+  command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/gen-subnet.py"
+  vars:
+    inputs:
+      db_path: "{{ node_systemdb_path }}"
+      supernet: "{{ node_network }}"
+      subnet_pfxlen: "{{ project_subnet_pfxlen }}"
+  args:
+    stdin: "{{ inputs|to_json }}"
+  changed_when: false
