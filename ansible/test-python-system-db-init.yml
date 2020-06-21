@@ -4,4 +4,4 @@
   vars:
     node_systemdb_path: /tmp/system.db
   tasks:
-    - import_tasks: tasks/node-init-systemdb.yml
+    - import_tasks: tasks/python-system-db-init.yml

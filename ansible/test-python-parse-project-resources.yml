@@ -15,7 +15,7 @@
         project_compose_cfg: "{{ lookup('file', project_compose_path)|from_yaml }}"
 
     - name: parse compose file
-      include_tasks: tasks/project-parse-docker-compose.yml
+      import_tasks: tasks/python-parse-project-resources.yml
 
     - name: show project resource records
       debug:

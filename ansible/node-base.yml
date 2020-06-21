@@ -61,7 +61,7 @@
         fstype: "{{ node_volstorage_fstype }}"
 
     - name: init systemdb
-      import_tasks: tasks/node-init-systemdb.yml
+      import_tasks: tasks/python-system-db-init.yml
 
   handlers:
 
