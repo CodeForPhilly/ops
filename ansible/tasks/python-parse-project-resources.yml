@@ -1,10 +1,13 @@
-# vars:
+# Inputs:
 # project_name           : Grid-wide unique project name
 # project_repo_url       : Git url repo can be publicly cloned from
 # project_repo_path      : The local path the repo is cloned to. The repo must be present here.
 # project_ref            : Identifier to tag container image builds
 # project_compose_file   : Path to docker-compose file relative to repo root
 # project_compose_cfg    : Unmarshalled YAML data from docker-compose file
+#
+# Outputs:
+# project_resources
 ---
 - name: validate compose file
   register: compose_validate_job
@@ -30,7 +33,7 @@
     - services
     - routes
 
-- name: import project resources
+- name: register project resources
   vars:
     resource_type: "{{ item.item }}"
     resource_list: "{{ item.stdout|from_json }}"
@@ -53,7 +56,7 @@
   environment:
     PYTHONPATH: "{{ playbook_dir }}/python/lib"
 
-- name: import service grid names
+- name: register service grid names
   set_fact:
     project_resources: "{{ project_resources|combine({ 'services': svc_gridnames_job.stdout|from_json }) }}"
 
@@ -75,7 +78,7 @@
   environment:
     PYTHONPATH: "{{ playbook_dir }}/python/lib"
 
-- name: import service container build instructions
+- name: register service container build instructions
   set_fact:
     project_resources: "{{ project_resources|combine({ 'services': svc_buildinfo_job.stdout|from_json }) }}"
 
@@ -92,7 +95,6 @@
   environment:
     PYTHONPATH: "{{ playbook_dir }}/python/lib"
 
-- name: import volume bindings
+- name: register volume bindings
   set_fact:
     project_resources: "{{ project_resources|combine({ 'volumes': vol_bindings_job.stdout|from_json }) }}"
-

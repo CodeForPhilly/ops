@@ -2,6 +2,9 @@
 # node_systemdb_path
 # node_network
 # project_subnet_pfxlen
+#
+# Outputs:
+# project_new_subnet
 ---
 - name: generate project subnet
   register: projnet_gen_job
@@ -14,3 +17,7 @@
   args:
     stdin: "{{ inputs|to_json }}"
   changed_when: false
+
+- name: register generated subnet
+  set_fact:
+    project_new_subnet: "{{ projnet_gen_job.stdout }}"

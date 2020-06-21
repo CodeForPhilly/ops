@@ -1,5 +1,8 @@
 # Inputs:
 # node_systemdb_path
+#
+# Outputs:
+# node_network
 ---
 - name: load node network prefix
   register: nodenet_load_job
