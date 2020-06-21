@@ -5,7 +5,6 @@ import random
 import ipaddress
 
 inputs        = json.loads(sys.stdin.read())
-db_path       = inputs['db_path']
 subnet_pfxlen = int(inputs['subnet_pfxlen'])
 supernet      = ipaddress.IPv6Network(inputs['supernet'])
 

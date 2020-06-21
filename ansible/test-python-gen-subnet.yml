@@ -2,12 +2,13 @@
 ---
 - hosts: localhost
   vars:
-    node_systemdb_path: /tmp/system.db
-    project_subnet_pfxlen: 96
+    node_systemdb_path  : /tmp/system.db
+    new_subnet_pfxlen   : 96
+    new_subnet_supernet : "{{ node_network }}"
   tasks:
 
     - import_tasks: tasks/node-load-network.yml
     - import_tasks: tasks/python-gen-subnet.yml
 
     - debug:
-        var: projnet_gen_job.stdout
+        var: new_subnet
