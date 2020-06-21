@@ -2,49 +2,27 @@ import sys
 import json
 import random
 import sqlite3
+import ipaddress
 
 inputs  = json.loads(sys.stdin.read())
 db_path = inputs['db_path']
 
-def hex2ip6(pfx, pfxsz):
-    ip6      = ''
-    chunksz  = 4
-    i        = 0
-    szunread = len(pfx[i:])
-
-    while i < len(pfx):
-
-        if szunread >= chunksz:
-            ip6 += pfx[i:i + chunksz]
-        else:
-            ip6 += pfx[i:]
-
-        i        += chunksz
-
-        if i < len(pfx):
-            szunread = len(pfx[i:])
-        else:
-            szunread = 0
-
-        if szunread > 0:
-            ip6 += ':'
-        else:
-            ip6 += '::/{}'.format(pfxsz)
-
-    return ip6
-
-
 if __name__ == '__main__':
-    node_id       = random.getrandbits(40).to_bytes(5, 'big').hex()
-    system_id     = random.getrandbits(40).to_bytes(5, 'big').hex()
-    node_v6_pfx   = hex2ip6('fd' + node_id, '48')
-    system_v6_pfx = hex2ip6('fd' + system_id, '48')
+    node_pfx       = random.getrandbits(40).to_bytes(5, 'big')
+    system_pfx     = random.getrandbits(40).to_bytes(5, 'big')
 
-    sys.stderr.write('{}\n'.format(node_id))
-    sys.stderr.write('{}\n'.format(node_v6_pfx))
+    node_net       = ipaddress.IPv6Network((
+                        b'\xfd' + node_pfx   + (b'\x00' * 10),
+                        48
+                    ))
 
-    db            = sqlite3.connect(db_path)
-    dbc           = db.cursor()
+    system_net     = ipaddress.IPv6Network((
+                        b'\xfd' + system_pfx + (b'\x00' * 10),
+                        48
+                    ))
+
+    db             = sqlite3.connect(db_path)
+    dbc            = db.cursor()
 
     dbc.executescript('''
         create table system_domain(
@@ -65,14 +43,14 @@ if __name__ == '__main__':
 
     dbc.execute(
         'insert into system_domain(attribute, value) values (?, ?)',
-        ('network', system_v6_pfx)
+        ('network', str(system_net))
     )
 
     dbc.executemany(
         'insert into node_domain(attribute, value) values (?, ?)',
         (
-            ('id', node_id),
-            ('network', node_v6_pfx)
+            ('id', node_pfx.hex()),
+            ('network', str(node_net))
         )
     )
 
