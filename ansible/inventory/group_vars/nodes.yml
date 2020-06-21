@@ -11,3 +11,5 @@ node_volstorage_mountpoint: /mnt/volstorage
 
 node_volmount_path: /srv/volumes
 node_projects_path: /srv/projects
+
+node_systemdb_path: /var/lib/system.db

@@ -6,7 +6,6 @@
   vars:
     dockerd_svc:
       archlinux: docker
-    node_systemdb_path: /var/lib/system.db
   tasks:
     - name: validate input vars
       assert:
