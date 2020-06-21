@@ -7,10 +7,7 @@
   tasks:
 
     - import_tasks: tasks/python-load-nodenet.yml
-
     - import_tasks: tasks/python-gen-subnet.yml
-      vars:
-        node_network: "{{ nodenet_load_job.stdout }}"
 
     - debug:
         var: projnet_gen_job.stdout

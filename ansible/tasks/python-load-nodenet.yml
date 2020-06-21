@@ -22,3 +22,7 @@
   args:
     executable: "{{ ansible_python.executable }}"
     stdin: "{{ inputs|to_json }}"
+
+- name: register node network prefix
+  set_fact:
+    node_network: "{{ nodenet_load_job.stdout }}"
