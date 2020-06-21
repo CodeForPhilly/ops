@@ -7,4 +7,4 @@
 
     - import_tasks: tasks/node-load-domains.yml
     - debug:
-        var: node_domains
+        var: domains

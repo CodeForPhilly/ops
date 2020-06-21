@@ -4,7 +4,7 @@
   vars:
     node_systemdb_path  : /tmp/system.db
     new_subnet_pfxlen   : 96
-    new_subnet_supernet : "{{ node_domains['node']['network'] }}"
+    new_subnet_supernet : "{{ domains['node']['network'] }}"
   tasks:
 
     - import_tasks: tasks/node-load-domains.yml

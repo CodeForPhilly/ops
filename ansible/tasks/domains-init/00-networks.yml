@@ -1,6 +1,6 @@
 ---
 - name: system supernet
-  when: node_domains['system']['network'] is not defined
+  when: domains['system']['network'] is not defined
   block:
 
     - name: generate system supernet
@@ -12,17 +12,17 @@
       register: system_supernet_set_job
       changed_when: new_supernet is defined
       set_fact:
-        node_domains: >-
+        domains: >-
           {{
-              node_domains                         |
+              domains                         |
               combine({
-                'system': node_domains['system']   |
+                'system': domains['system']   |
                 combine({ 'network': new_supernet })
               })
           }}
 
 - name: node supernet
-  when: node_domains['node']['network'] is not defined
+  when: domains['node']['network'] is not defined
   block:
 
     - name: generate node supernet
@@ -35,11 +35,11 @@
       changed_when: new_supernet is defined
       register: node_supernet_set_job
       set_fact:
-        node_domains: >-
+        domains: >-
           {{
-              node_domains                         |
+              domains                         |
               combine({
-                'node': node_domains['node']   |
+                'node': domains['node']   |
                 combine({ 'network': new_supernet })
               })
           }}
@@ -52,7 +52,7 @@
     db.executescript('''
 
       insert into system_domain (attribute, value)
-      values ("network", "{{ node_domains['system']['network'] }}")
+      values ("network", "{{ domains['system']['network'] }}")
 
     ''')
     db.commit()
@@ -69,7 +69,7 @@
     db.executescript('''
 
       insert into node_domain (attribute, value)
-      values ("network", "{{ node_domains['node']['network'] }}")
+      values ("network", "{{ domains['node']['network'] }}")
 
     ''')
     db.commit()

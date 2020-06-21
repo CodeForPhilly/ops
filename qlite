@@ -1,0 +1,173 @@
+[1mdiff --git a/ansible/node-base-systemdb.yml b/ansible/node-base-systemdb.yml[m
+[1mindex 9d9fe10..8ea40d5 100644[m
+[1m--- a/ansible/node-base-systemdb.yml[m
+[1m+++ b/ansible/node-base-systemdb.yml[m
+[36m@@ -19,7 +19,7 @@[m
+               attribute,[m
+               value[m
+           );[m
+[31m-          create table node_domain([m
+[32m+[m[32m          create table domain([m
+               attribute,[m
+               value[m
+           );[m
+[1mdiff --git a/ansible/tasks/domains-init/00-networks.yml b/ansible/tasks/domains-init/00-networks.yml[m
+[1mindex 73887e5..f9adf9f 100644[m
+[1m--- a/ansible/tasks/domains-init/00-networks.yml[m
+[1m+++ b/ansible/tasks/domains-init/00-networks.yml[m
+[36m@@ -1,6 +1,6 @@[m
+ ---[m
+ - name: system supernet[m
+[31m-  when: node_domains['system']['network'] is not defined[m
+[32m+[m[32m  when: domains['system']['network'] is not defined[m
+   block:[m
+ [m
+     - name: generate system supernet[m
+[36m@@ -12,17 +12,17 @@[m
+       register: system_supernet_set_job[m
+       changed_when: new_supernet is defined[m
+       set_fact:[m
+[31m-        node_domains: >-[m
+[32m+[m[32m        domains: >-[m
+           {{[m
+[31m-              node_domains                         |[m
+[32m+[m[32m              domains                         |[m
+               combine({[m
+[31m-                'system': node_domains['system']   |[m
+[32m+[m[32m                'system': domains['system']   |[m
+                 combine({ 'network': new_supernet })[m
+               })[m
+           }}[m
+ [m
+ - name: node supernet[m
+[31m-  when: node_domains['node']['network'] is not defined[m
+[32m+[m[32m  when: domains['node']['network'] is not defined[m
+   block:[m
+ [m
+     - name: generate node supernet[m
+[36m@@ -35,11 +35,11 @@[m
+       changed_when: new_supernet is defined[m
+       register: node_supernet_set_job[m
+       set_fact:[m
+[31m-        node_domains: >-[m
+[32m+[m[32m        domains: >-[m
+           {{[m
+[31m-              node_domains                         |[m
+[32m+[m[32m              domains                         |[m
+               combine({[m
+[31m-                'node': node_domains['node']   |[m
+[32m+[m[32m                'node': domains['node']   |[m
+                 combine({ 'network': new_supernet })[m
+               })[m
+           }}[m
+[36m@@ -52,7 +52,7 @@[m
+     db.executescript('''[m
+ [m
+       insert into system_domain (attribute, value)[m
+[31m-      values ("network", "{{ node_domains['system']['network'] }}")[m
+[32m+[m[32m      values ("network", "{{ domains['system']['network'] }}")[m
+ [m
+     ''')[m
+     db.commit()[m
+[36m@@ -68,8 +68,8 @@[m
+     db = sqlite3.connect('{{ node_systemdb_path }}')[m
+     db.executescript('''[m
+ [m
+[31m-      insert into node_domain (attribute, value)[m
+[31m-      values ("network", "{{ node_domains['node']['network'] }}")[m
+[32m+[m[32m      insert into domain (attribute, value)[m
+[32m+[m[32m      values ("network", "{{ domains['node']['network'] }}")[m
+ [m
+     ''')[m
+     db.commit()[m
+[1mdiff --git a/ansible/tasks/domains-init/01-id.yml b/ansible/tasks/domains-init/01-id.yml[m
+[1mindex 202ffeb..cb89bd0 100644[m
+[1m--- a/ansible/tasks/domains-init/01-id.yml[m
+[1m+++ b/ansible/tasks/domains-init/01-id.yml[m
+[36m@@ -1,13 +1,13 @@[m
+ ---[m
+ - name: node id[m
+[31m-  when: node_domains['node']['id'] is not defined[m
+[32m+[m[32m  when: domains['node']['id'] is not defined[m
+   block:[m
+ [m
+     - name: create node id[m
+       register: node_id_create_job[m
+       shell: |[m
+         import sys, ipaddress, math[m
+[31m-        node_net       = ipaddress.IPv6Network('{{ node_domains['node']['network'] }}')[m
+[32m+[m[32m        node_net       = ipaddress.IPv6Network('{{ domains['node']['network'] }}')[m
+         node_net_bytes = int(node_net.network_address).to_bytes(16, 'big')[m
+         node_net_pfxid = node_net_bytes[:math.ceil(node_net.prefixlen / 8)][1:][m
+         sys.stdout.write(node_net_pfxid.hex())[m
+[36m@@ -17,11 +17,11 @@[m
+ [m
+     - name: register node id[m
+       set_fact:[m
+[31m-        node_domains: >-[m
+[32m+[m[32m        domains: >-[m
+           {{[m
+[31m-              node_domains                         |[m
+[32m+[m[32m              domains                         |[m
+               combine({[m
+[31m-                'node': node_domains['node']   |[m
+[32m+[m[32m                'node': domains['node']   |[m
+                 combine({ 'id': node_id_create_job.stdout })[m
+               })[m
+           }}[m
+[36m@@ -33,8 +33,8 @@[m
+     db = sqlite3.connect('{{ node_systemdb_path }}')[m
+     db.executescript('''[m
+ [m
+[31m-      insert into node_domain (attribute, value)[m
+[31m-      values ("id", "{{ node_domains['node']['id'] }}")[m
+[32m+[m[32m      insert into domain (attribute, value)[m
+[32m+[m[32m      values ("id", "{{ domains['node']['id'] }}")[m
+ [m
+     ''')[m
+     db.commit()[m
+[1mdiff --git a/ansible/tasks/node-load-domains.yml b/ansible/tasks/node-load-domains.yml[m
+[1mindex adacc05..048d0b2 100644[m
+[1m--- a/ansible/tasks/node-load-domains.yml[m
+[1m+++ b/ansible/tasks/node-load-domains.yml[m
+[36m@@ -2,7 +2,7 @@[m
+ # node_systemdb_path[m
+ #[m
+ # Outputs:[m
+[31m-# node_domains[m
+[32m+[m[32m# domains[m
+ ---[m
+ - name: load domains[m
+   register: domains_load_job[m
+[36m@@ -39,7 +39,7 @@[m
+     scope: "{{ item.item }}"[m
+     attrs: "{{ item.stdout|from_json }}"[m
+   set_fact:[m
+[31m-    node_domains: "{{ node_domains|default({})|combine({ scope: attrs }) }}"[m
+[32m+[m[32m    domains: "{{ domains|default({})|combine({ scope: attrs }) }}"[m
+   loop: "{{ domains_load_job.results }}"[m
+   loop_control:[m
+     label: "{{ scope }}"[m
+[1mdiff --git a/ansible/test-node-load-domains.yml b/ansible/test-node-load-domains.yml[m
+[1mindex 2449912..f545681 100755[m
+[1m--- a/ansible/test-node-load-domains.yml[m
+[1m+++ b/ansible/test-node-load-domains.yml[m
+[36m@@ -7,4 +7,4 @@[m
+ [m
+     - import_tasks: tasks/node-load-domains.yml[m
+     - debug:[m
+[31m-        var: node_domains[m
+[32m+[m[32m        var: domains[m
+[1mdiff --git a/ansible/test-python-gen-subnet.yml b/ansible/test-python-gen-subnet.yml[m
+[1mindex d948a00..c0a01cd 100755[m
+[1m--- a/ansible/test-python-gen-subnet.yml[m
+[1m+++ b/ansible/test-python-gen-subnet.yml[m
+[36m@@ -4,7 +4,7 @@[m
+   vars:[m
+     node_systemdb_path  : /tmp/system.db[m
+     new_subnet_pfxlen   : 96[m
+[31m-    new_subnet_supernet : "{{ node_domains['node']['network'] }}"[m
+[32m+[m[32m    new_subnet_supernet : "{{ domains['node']['network'] }}"[m
+   tasks:[m
+ [m
+     - import_tasks: tasks/node-load-domains.yml[m
