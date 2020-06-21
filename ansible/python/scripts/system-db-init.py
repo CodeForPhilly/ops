@@ -55,6 +55,12 @@ if __name__ == '__main__':
             attribute,
             value
         );
+        create table node_subnets(
+            prefix,
+            namespace,
+            project,
+            provider_id
+        )
     ''')
 
     dbc.execute(
