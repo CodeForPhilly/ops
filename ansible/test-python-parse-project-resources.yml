@@ -7,8 +7,8 @@
     project_ref          : HEAD
     project_name         : myproject
     project_compose_file : ansible/test/parser-compose-file.yml
-    project_compose_path : "{{ (project_repo_path ~ '/' ~ project_compose_file) | realpath }}"
-    project_repo_path    : "{{ project_repo_url|dirname }}"
+    project_compose_path : "{{ (project_repo_dir ~ '/' ~ project_compose_file) | realpath }}"
+    project_repo_dir     : "{{ project_repo_url|dirname }}"
   tasks:
     - name: load compose file
       set_fact:

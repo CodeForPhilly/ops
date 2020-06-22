@@ -1,10 +1,21 @@
 #!/usr/bin/env ansible-playbook
 ---
-- name: Deploy system project
-  hosts: nodes
+# Forcing the controller to run this play
+# allows us to use the path hostvars.localhost.project_home
+# later on to lookup project resources on the controller
+- name: Load project home paths
+  hosts:
+    - nodes
+    - localhost
   vars:
     project_name: system
-    node_records_dir: "{{ node_projects_path }}/{{ project_name }}"
+  tasks:
+    - name: project path
+      import_tasks: tasks/project-local-paths.yml
+
+
+- name: Deploy system project
+  hosts: nodes
   tasks:
 
     - name: domains
@@ -18,16 +29,11 @@
       set_fact:
         node_images: "{{ images_info_job.images }}"
 
-    - name: controller records paths
-      import_tasks: tasks/project-records-paths.yml
-
     - name: load system project resources
       import_tasks: tasks/project-load-resources.yml
 
     - name: push system project resource files
       include_tasks: tasks/project-dump-resources.yml
-      vars:
-        project_records_dir: "{{ node_records_dir }}"
 
     - name: create system nat network
       docker_network:
@@ -40,7 +46,7 @@
         ipam_config:
           - subnet: "{{ domains['system']['network'] }}"
 
-    - name: pull system project images
+    - name: pull system project remote images
       when:
         - svc.container_opts.image is defined
         - svc.container_opts.image|length > 0
@@ -53,7 +59,7 @@
       vars:
         svc: "{{ item }}"
 
-    - name: build system project images
+    - name: build system project local images
       when:
         - svc.container_opts.image is not defined or svc.container_opts.image|length == 0
         - svc.container_opts.build.image not in lookup('flattened', images_info_job.images|map(attribute='RepoTags')|list, wantlist=True)

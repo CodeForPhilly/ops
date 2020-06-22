@@ -2,12 +2,13 @@ import sys
 import json
 import pathlib
 import re
+import os
 
 inputs = json.loads(sys.stdin.read())
 
 project_name         = inputs['project_name']
 project_repo_url     = inputs['project_repo_url']
-project_repo_path    = inputs['project_repo_path']
+project_repo_dir     = inputs['project_repo_dir']
 project_ref          = inputs['project_ref']
 project_compose_file = inputs['project_compose_file']
 project_compose_cfg  = inputs['project_compose_cfg']
@@ -42,11 +43,11 @@ if __name__ == '__main__':
 
             # Enforce docker context as repo url
             if not re.match(r'^[a-z]+://', dockerfile_context):
-                repo_path          = pathlib.Path(project_repo_path)
-                compose_file_path  = repo_path.joinpath(project_compose_file)
+                repo_dir           = pathlib.Path(project_repo_dir)
+                compose_file_path  = repo_dir.joinpath(project_compose_file)
                 context_path       = compose_file_path.parent.joinpath(dockerfile_context)
-                context_subpath    = context_path.relative_to(repo_path)
-                dockerfile_context = '{}#{}:{}'.format(project_repo_url, project_ref, context_subpath)
+                context_subpath    = context_path.relative_to(repo_dir)
+                dockerfile_context = '{}#{}:{}'.format(project_repo_url, project_ref, os.path.normpath(context_subpath))
 
             svc['container_opts']['build'] = {
                 'image'              : '{}:{}'.format(dockerfile_img_name, dockerfile_img_tag),

@@ -1,12 +1,12 @@
 # Inputs:
-# project_records_dir
+# hostvars.localhost.project_resources_dir
 #
 # Outputs:
 # project_resources
 ---
-- name: load records
+- name: load resources
   set_fact:
     project_resources:
-      services : "{{ lookup('file', project_records_dir ~ '/services.yml') | from_yaml }}"
-      volumes  : "{{ lookup('file', project_records_dir ~ '/volumes.yml')  | from_yaml }}"
-      routes   : "{{ lookup('file', project_records_dir ~ '/routes.yml')   | from_yaml }}"
+      services : "{{ lookup('file', hostvars.localhost.project_resources_dir ~ '/services.yml') | from_yaml }}"
+      volumes  : "{{ lookup('file', hostvars.localhost.project_resources_dir ~ '/volumes.yml')  | from_yaml }}"
+      routes   : "{{ lookup('file', hostvars.localhost.project_resources_dir ~ '/routes.yml')   | from_yaml }}"

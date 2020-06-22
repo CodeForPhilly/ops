@@ -7,8 +7,7 @@
     project_compose_file : docker/projects/grid-node-system/docker-compose.yml
     project_repo_url     : "{{ lookup('env', 'PROJECT_GIT_URL') }}" # REQUIRED
     project_ref          : "{{ lookup('env', 'PROJECT_GIT_REF') }}" # REQUIRED
-    project_compose_path : "{{ (project_repo_path ~ '/' ~ project_compose_file) | realpath }}"
-    project_repo_path    : "{{ playbook_dir ~ '/project-repos/' ~ project_name }}"
+    project_compose_path : "{{ (project_repo_dir ~ '/' ~ project_compose_file) | realpath }}"
   tasks:
     - name: validate input vars
       assert:
@@ -21,21 +20,8 @@
           - 'project_repo_url = {{ project_repo_url }}'
           - 'project_ref      = {{ project_ref }}'
 
-    - name: clone project
-      when: project_repo_url|length > 0
-      git:
-        repo: "{{ project_repo_url }}"
-        dest: "{{ project_repo_path }}"
-        version: "{{ project_ref }}"
-        depth: 1
-        recursive: false
-
-    - name: load compose file
-      set_fact:
-        project_compose_cfg: "{{ lookup('file', project_compose_path)|from_yaml }}"
-
-    - name: parse compose file
-      import_tasks: tasks/python-parse-project-resources.yml
+    - name: parse base resources
+      import_tasks: tasks/project-parse-resources.yml
 
     - name: parse system service parameters
       register: system_svcs_parse_job
@@ -53,9 +39,6 @@
     - name: import system services
       set_fact:
         project_resources: "{{ project_resources|combine({ 'services': system_svcs_parse_job.stdout|from_json }) }}"
-
-    - name: resource record paths
-      import_tasks: tasks/project-records-paths.yml
 
     - name: dump project resources
       import_tasks: tasks/project-dump-resources.yml

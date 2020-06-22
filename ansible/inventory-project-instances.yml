@@ -2,14 +2,15 @@
 ---
 - name: Build project instances group
   hosts: localhost
-  vars:
-    project_records_dir: "{{ playbook_dir }}/project-records"
   tasks:
 
-    - name: load project services
+    - name: project paths
+      import_tasks: tasks/project-local-paths.yml
+
+    - name: load service resource records
       register: load_svcs_job
       vars:
-        records_load_dir: "{{ project_records_dir }}/{{ item }}"
+        records_load_dir: "{{ projects_home }}/{{ item }}/resources"
       set_fact:
         project_services: >-
           {{
@@ -20,10 +21,10 @@
           }}
       loop: "{{ groups['projects'] }}"
 
-    - name: load project volumes
+    - name: load volume resource records
       register: load_vols_job
       vars:
-        records_load_dir: "{{ project_records_dir }}/{{ item }}"
+        records_load_dir: "{{ projects_home }}/{{ item }}/resources"
       set_fact:
         project_volumes: >-
           {{
@@ -34,10 +35,10 @@
           }}
       loop: "{{ groups['projects'] }}"
 
-    - name: load project routes
+    - name: load route resource records
       register: load_routes_job
       vars:
-        records_load_dir: "{{ project_records_dir }}/{{ item }}"
+        records_load_dir: "{{ projects_home }}/{{ item }}/resources"
       set_fact:
         project_routes: >-
           {{
@@ -63,7 +64,7 @@
       vars:
         project_name: "{{ item[0].project }}"
         placement_host: "{{ item[1].host }}"
-        svc_replicas: "{{ item[1].replicas }}"
+        svc_counts: "{{ item[1].svc_counts }}"
         project_instance: "{{ project_name }}.{{ placement_host }}"
       add_host:
         name: "{{ project_instance }}"
@@ -73,7 +74,7 @@
         project_services: "{{ project_services[project_name] }}"
         project_volumes: "{{ project_volumes[project_name] }}"
         project_routes: "{{ project_routes[project_name] }}"
-        project_replicas: "{{ svc_replicas }}"
+        project_svc_counts: "{{ svc_counts }}"
 
       loop: "{{ lookup('subelements', project_placements, 'placement', wantlist=True) }}"
       loop_control:

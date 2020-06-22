@@ -1,0 +1,30 @@
+# Inputs:
+# projects_home (optional)
+# project_name  (optional)
+#
+# Outputs:
+# projects_home
+# project_resources_dir (when name specified)
+# project_repo_dir      (when name specified)
+---
+- name: set default project home
+  when: >
+    projects_home is not defined or
+    projects_home|length == 0
+  set_fact:
+    projects_home: >-
+      {% if inventory_hostname == 'localhost' -%}
+      {{ playbook_dir }}/projects
+      {%- else -%}
+      {{ node_projects_path }}
+      {%- endif %}
+
+- name: set project resources dir
+  when: project_name is defined
+  set_fact:
+    project_resources_dir: "{{ projects_home }}/{{ project_name }}/resources"
+
+- name: set project repo dir
+  when: project_name is defined
+  set_fact:
+    project_repo_dir: "{{ projects_home }}/{{ project_name }}/repo"

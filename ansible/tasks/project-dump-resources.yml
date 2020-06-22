@@ -1,14 +1,14 @@
 # Inputs:
-# project_records_dir
+# project_resources_dir
 ---
 - name: create dump dir
   file:
-    path: "{{ project_records_dir }}"
+    path: "{{ project_resources_dir }}"
     state: directory
 
-- name: dump records
+- name: dump resource records
   vars:
-    dump_path: "{{ project_records_dir }}/{{ item }}.yml"
+    dump_path: "{{ project_resources_dir }}/{{ item }}.yml"
   copy:
     dest: "{{ dump_path }}"
     content: |

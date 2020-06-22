@@ -1,7 +1,7 @@
 # Inputs:
 # project_name           : Grid-wide unique project name
 # project_repo_url       : Git url repo can be publicly cloned from
-# project_repo_path      : The local path the repo is cloned to. The repo must be present here.
+# project_repo_dir       : The local path the repo is cloned to. The repo must be present here.
 # project_ref            : Identifier to tag container image builds
 # project_compose_file   : Path to docker-compose file relative to repo root
 # project_compose_cfg    : Unmarshalled YAML data from docker-compose file
@@ -68,7 +68,7 @@
     inputs:
       project_name         : "{{ project_name }}"
       project_repo_url     : "{{ project_repo_url }}"
-      project_repo_path    : "{{ project_repo_path }}"
+      project_repo_dir     : "{{ project_repo_dir }}"
       project_ref          : "{{ project_ref }}"
       project_compose_file : "{{ project_compose_file }}"
       project_compose_cfg  : "{{ project_compose_cfg }}"

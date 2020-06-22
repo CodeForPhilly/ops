@@ -7,8 +7,7 @@
     project_ref          : "{{ lookup('env', 'PROJECT_GIT_REF') }}" # REQUIRED
     project_name         : "{{ lookup('env', 'PROJECT_NAME') }}"
     project_compose_file : "{{ lookup('env', 'COMPOSE_FILE') }}"
-    project_compose_path : "{{ (project_repo_path ~ '/' ~ project_compose_file) | realpath }}"
-    project_repo_path    : "{{ playbook_dir ~ '/project-repos/' ~ project_name }}"
+    project_compose_path : "{{ (project_repo_dir ~ '/' ~ project_compose_file) | realpath }}"
   tasks:
     - name: validate input vars
       assert:
@@ -36,24 +35,8 @@
           {{ project_repo_url|basename|regex_replace('(.*)\.git', '\1') }}
           {%- endif %}
 
-    - name: clone project
-      when: project_repo_url|length > 0
-      git:
-        repo: "{{ project_repo_url }}"
-        dest: "{{ project_repo_path }}"
-        version: "{{ project_ref }}"
-        depth: 1
-        recursive: false
-
-    - name: load compose file
-      set_fact:
-        project_compose_cfg: "{{ lookup('file', project_compose_path)|from_yaml }}"
-
-    - name: parse compose file
-      import_tasks: tasks/python-parse-project-resources.yml
-
-    - name: resource record paths
-      import_tasks: tasks/project-records-paths.yml
+    - name: parse resources
+      import_tasks: tasks/project-parse-resources.yml
 
     - name: dump project resources
       import_tasks: tasks/project-dump-resources.yml
