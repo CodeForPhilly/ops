@@ -20,6 +20,12 @@
           - 'project_repo_url = {{ project_repo_url }}'
           - 'project_ref      = {{ project_ref }}'
 
+    - name: project paths
+      import_tasks: tasks/project-local-paths.yml
+
+    - name: fetch project
+      import_tasks: tasks/project-fetch.yml
+
     - name: parse base resources
       import_tasks: tasks/project-parse-resources.yml
 

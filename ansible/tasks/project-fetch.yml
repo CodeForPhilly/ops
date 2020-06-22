@@ -1,0 +1,18 @@
+# Inputs:
+# project_repo_url
+# project_repo_dir
+# project_ref
+---
+- name: create project home
+  file:
+    path: "{{ project_repo_dir|dirname }}"
+    state: directory
+
+- name: clone project
+  when: project_repo_url|length > 0
+  git:
+    repo: "{{ project_repo_url }}"
+    dest: "{{ project_repo_dir }}"
+    version: "{{ project_ref }}"
+    depth: 1
+    recursive: false

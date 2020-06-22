@@ -35,6 +35,12 @@
           {{ project_repo_url|basename|regex_replace('(.*)\.git', '\1') }}
           {%- endif %}
 
+    - name: project paths
+      import_tasks: tasks/project-local-paths.yml
+
+    - name: fetch project
+      import_tasks: tasks/project-fetch.yml
+
     - name: parse resources
       import_tasks: tasks/project-parse-resources.yml
 
