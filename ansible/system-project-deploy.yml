@@ -1,0 +1,18 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Deploy system project
+  hosts: nodes
+  vars:
+    project_name: system
+    node_records_dir: "{{ node_projects_path }}/{{ project_name }}"
+  tasks:
+    - name: controller records paths
+      import_tasks: tasks/project-records-paths.yml
+
+    - name: load system project resources
+      import_tasks: tasks/project-load-resources.yml
+
+    - name: push system project resource files
+      include_tasks: tasks/project-dump-resources.yml
+      vars:
+        project_records_dir: "{{ node_records_dir }}"

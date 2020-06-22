@@ -52,5 +52,8 @@
     - name: parse compose file
       import_tasks: tasks/python-parse-project-resources.yml
 
+    - name: resource record paths
+      import_tasks: tasks/project-records-paths.yml
+
     - name: dump project resources
       import_tasks: tasks/project-dump-resources.yml

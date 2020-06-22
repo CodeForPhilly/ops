@@ -54,5 +54,8 @@
       set_fact:
         project_resources: "{{ project_resources|combine({ 'services': system_svcs_parse_job.stdout|from_json }) }}"
 
+    - name: resource record paths
+      import_tasks: tasks/project-records-paths.yml
+
     - name: dump project resources
       import_tasks: tasks/project-dump-resources.yml

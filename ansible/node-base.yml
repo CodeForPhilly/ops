@@ -42,6 +42,7 @@
       file:
         path: "{{ item }}"
         state: directory
+        owner: "{% if item == node_projects_path %}{{ node_admin_user }}{% else %}{{ omit }}{% endif %}"
       loop:
         - "{{ node_volstorage_mountpoint }}"
         - "{{ node_volmount_path }}"

@@ -1,7 +1,6 @@
+# Inputs:
+# project_records_dir
 ---
-- name: path variables
-  import_tasks: tasks/project-records-vars.yml
-
 - name: create dump dir
   file:
     path: "{{ project_records_dir }}"
