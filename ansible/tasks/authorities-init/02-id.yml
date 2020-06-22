@@ -28,17 +28,7 @@
 
 - name: commit node id
   when: node_id_create_job.changed
-  shell: |
-    import sys, sqlite3
-    db = sqlite3.connect('{{ node_systemdb_path }}')
-    db.executescript('''
-
-      insert into authorities (name, attribute, value)
-      values ("node.domain", "id", "{{ authorities['node.domain']['id'] }}")
-
-    ''')
-    db.commit()
-    db.close()
-    sys.exit(0)
-  args:
-    executable: "{{ ansible_python.executable }}"
+  include_tasks: tasks/node-commit-authority-attr.yml
+  vars:
+    authority_name: node.domain
+    authority_attr: id

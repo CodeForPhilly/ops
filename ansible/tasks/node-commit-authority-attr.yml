@@ -1,0 +1,25 @@
+# Inputs:
+# authority_name
+# authority_attr
+#
+# The name and attr both
+# must be present in the
+# authorities map
+---
+- name: commit authority attribute
+  shell: |
+    import sys, sqlite3
+    db = sqlite3.connect('{{ node_systemdb_path }}')
+    db.executescript('''
+
+      delete from authorities where name = "{{ authority_name }}" and attribute = "{{ authority_attr }}";
+
+      insert into authorities (name, attribute, value)
+      values ("{{ authority_name }}", "{{ authority_attr }}", "{{ authorities[authority_name][authority_attr] }}");
+
+    ''')
+    db.commit()
+    db.close()
+    sys.exit(0)
+  args:
+    executable: "{{ ansible_python.executable }}"

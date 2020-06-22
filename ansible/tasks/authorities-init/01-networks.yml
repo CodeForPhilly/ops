@@ -46,34 +46,14 @@
 
 - name: commit system supernet
   when: system_supernet_set_job.changed
-  shell: |
-    import sys, sqlite3
-    db = sqlite3.connect('{{ node_systemdb_path }}')
-    db.executescript('''
-
-      insert into authorities (name, attribute, value)
-      values ("system.domain", "network", "{{ authorities['system.domain']['network'] }}")
-
-    ''')
-    db.commit()
-    db.close()
-    sys.exit(0)
-  args:
-    executable: "{{ ansible_python.executable }}"
+  include_tasks: tasks/node-commit-authority-attr.yml
+  vars:
+    authority_name: system.domain
+    authority_attr: network
 
 - name: commit node supernet
   when: node_supernet_set_job.changed
-  shell: |
-    import sys, sqlite3
-    db = sqlite3.connect('{{ node_systemdb_path }}')
-    db.executescript('''
-
-      insert into authorities (name, attribute, value)
-      values ("node.domain", "network", "{{ authorities['node.domain']['network'] }}")
-
-    ''')
-    db.commit()
-    db.close()
-    sys.exit(0)
-  args:
-    executable: "{{ ansible_python.executable }}"
+  include_tasks: tasks/node-commit-authority-attr.yml
+  vars:
+    authority_name: node.domain
+    authority_attr: network
