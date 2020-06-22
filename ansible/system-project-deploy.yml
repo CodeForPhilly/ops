@@ -6,6 +6,18 @@
     project_name: system
     node_records_dir: "{{ node_projects_path }}/{{ project_name }}"
   tasks:
+
+    - name: domains
+      import_tasks: tasks/node-load-domains.yml
+
+    - name: load images info
+      register: images_info_job
+      docker_image_info:
+
+    - name: images info var
+      set_fact:
+        node_images: "{{ images_info_job.images }}"
+
     - name: controller records paths
       import_tasks: tasks/project-records-paths.yml
 
@@ -16,3 +28,38 @@
       include_tasks: tasks/project-dump-resources.yml
       vars:
         project_records_dir: "{{ node_records_dir }}"
+
+    - name: create system nat network
+      docker_network:
+        name: system.domain_nat
+
+    - name: create system domain network
+      docker_network:
+        name: system.domain
+        enable_ipv6: true
+        ipam_config:
+          - subnet: "{{ domains['system']['network'] }}"
+
+    - name: pull system project images
+      when:
+        - svc.container_opts.image is defined
+        - svc.container_opts.image|length > 0
+      docker_image:
+        name: "{{ svc.container_opts.image }}"
+        source: pull
+      loop: "{{ project_resources['services'] }}"
+      loop_control:
+        label: "{{ svc.name }}"
+      vars:
+        svc: "{{ item }}"
+
+    - name: build system project images
+      when:
+        - svc.container_opts.image is not defined or svc.container_opts.image|length == 0
+        - svc.container_opts.build.image not in lookup('flattened', images_info_job.images|map(attribute='RepoTags')|list, wantlist=True)
+      command: docker build -t '{{ svc.container_opts.build.image }}' '{{ svc.container_opts.build.dockerfile_context }}'
+      loop: "{{ project_resources['services'] }}"
+      loop_control:
+        label: "{{ svc.name }}"
+      vars:
+        svc: "{{ item }}"
