@@ -6,12 +6,14 @@
 ---
 - name: generate new supernet
   register: supernet_gen_job
-  command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/gen-supernet.py"
+  shell: |
+    {{ lookup('file', playbook_dir ~ '/python/scripts/gen-supernet.py') }}
   vars:
     inputs:
       pfxlen: "{{ new_supernet_pfxlen }}"
   args:
     stdin: "{{ inputs|to_json }}"
+    executable: "{{ ansible_python.executable }}"
   changed_when: false
 
 - name: register generated supernet

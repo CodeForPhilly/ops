@@ -2,6 +2,7 @@
 ---
 - name: Initialize and populate system database
   hosts: nodes
+  become: true
   tasks:
 
     - name: initialize the system db

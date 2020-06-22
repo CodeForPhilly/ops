@@ -7,14 +7,18 @@
 ---
 - name: generate new subnet
   register: subnet_gen_job
-  command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/gen-subnet.py"
+  shell: |
+    {{ lookup('file', playbook_dir ~ '/python/scripts/gen-subnet.py') }}
   vars:
     inputs:
       supernet: "{{ new_subnet_supernet }}"
       subnet_pfxlen: "{{ new_subnet_pfxlen }}"
   args:
     stdin: "{{ inputs|to_json }}"
+    executable: "{{ ansible_python.executable }}"
   changed_when: false
+  delegate_to: localhost
+  become: false
 
 - name: register generated subnet
   set_fact:
