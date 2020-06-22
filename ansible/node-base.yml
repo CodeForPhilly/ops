@@ -38,6 +38,12 @@
         state: started
         enabled: true
 
+    - name: dockerd admin privileges
+      user:
+        name: "{{ node_admin_user }}"
+        groups:
+          - docker
+
     - name: create system directories
       file:
         path: "{{ item }}"
