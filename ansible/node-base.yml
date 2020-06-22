@@ -32,17 +32,17 @@
             "ipv6": true
           }
 
-    - name: dockerd service
-      service:
-        name: "{{ dockerd_svc[ansible_distribution|lower] }}"
-        state: started
-        enabled: true
-
     - name: dockerd admin privileges
       user:
         name: "{{ node_admin_user }}"
         groups:
           - docker
+
+    - name: dockerd service
+      service:
+        name: "{{ dockerd_svc[ansible_distribution|lower] }}"
+        state: started
+        enabled: true
 
     - name: create system directories
       file:
@@ -85,3 +85,11 @@
             dest: ~/.ssh/authorized_keys
           tags:
             - admin:env:authkeys
+
+        - name: install python dependencies
+          pip:
+            name:
+              - docker
+            virtualenv: "{{ node_admin_venv }}"
+          tags:
+            - admin:env:venv
