@@ -1,6 +1,6 @@
 ---
 - name: system supernet
-  when: domains['system']['network'] is not defined
+  when: authorities['system.domain']['network'] is not defined
   block:
 
     - name: generate system supernet
@@ -12,17 +12,17 @@
       register: system_supernet_set_job
       changed_when: new_supernet is defined
       set_fact:
-        domains: >-
+        authorities: >-
           {{
-              domains                         |
+              authorities|
               combine({
-                'system': domains['system']   |
+                'system.domain': authorities['system.domain']|
                 combine({ 'network': new_supernet })
               })
           }}
 
 - name: node supernet
-  when: domains['node']['network'] is not defined
+  when: authorities['node.domain']['network'] is not defined
   block:
 
     - name: generate node supernet
@@ -35,11 +35,11 @@
       changed_when: new_supernet is defined
       register: node_supernet_set_job
       set_fact:
-        domains: >-
+        authorities: >-
           {{
-              domains                         |
+              authorities|
               combine({
-                'node': domains['node']   |
+                'node.domain': authorities['node.domain']|
                 combine({ 'network': new_supernet })
               })
           }}
@@ -51,8 +51,8 @@
     db = sqlite3.connect('{{ node_systemdb_path }}')
     db.executescript('''
 
-      insert into system_domain (attribute, value)
-      values ("network", "{{ domains['system']['network'] }}")
+      insert into authorities (name, attribute, value)
+      values ("system.domain", "network", "{{ authorities['system.domain']['network'] }}")
 
     ''')
     db.commit()
@@ -68,8 +68,8 @@
     db = sqlite3.connect('{{ node_systemdb_path }}')
     db.executescript('''
 
-      insert into node_domain (attribute, value)
-      values ("network", "{{ domains['node']['network'] }}")
+      insert into authorities (name, attribute, value)
+      values ("node.domain", "network", "{{ authorities['node.domain']['network'] }}")
 
     ''')
     db.commit()

@@ -4,4 +4,7 @@
   vars:
     node_systemdb_path: /tmp/system.db
   tasks:
-    - import_tasks: tasks/python-system-db-init.yml
+
+    - import_tasks: tasks/node-load-authorities.yml
+    - debug:
+        var: authorities

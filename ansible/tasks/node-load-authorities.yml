@@ -1,0 +1,42 @@
+# Inputs:
+# node_systemdb_path
+#
+# Outputs:
+# authorities
+---
+- name: load authorities
+  register: authorities_load_job
+  changed_when: false
+  vars:
+    inputs:
+      db_path: "{{ node_systemdb_path }}"
+  shell: |
+    import sys, json, sqlite3
+    inputs      = json.loads(sys.stdin.read())
+    db_path     = inputs['db_path']
+    db          = sqlite3.connect(db_path)
+    records     = db.execute(
+      'select name, attribute, value from authorities'
+    ).fetchall()
+
+    authorities = {
+      'system.domain': {},
+      'node.domain': {}
+    }
+
+    for authority, attr, val in records:
+      if authority in authorities.keys():
+        authorities[authority][attr] = val
+      else:
+        authorities[authority] = { attr: val }
+
+    db.close()
+    sys.stdout.write(json.dumps(authorities))
+    sys.exit(0)
+  args:
+    executable: "{{ ansible_python.executable }}"
+    stdin: "{{ inputs|to_json }}"
+
+- name: register authorities
+  set_fact:
+    authorities: "{{ authorities_load_job.stdout|from_json }}"

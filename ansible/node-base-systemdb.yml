@@ -16,19 +16,12 @@
         db      = sqlite3.connect(db_path)
         db.executescript('''
 
-          create table system_domain(
-              attribute,
-              value
+          create table authorities
+          (
+            name,
+            attribute,
+            value
           );
-          create table node_domain(
-              attribute,
-              value
-          );
-          create table projects(
-              name,
-              attribute,
-              value
-          )
 
         ''')
         db.commit()
@@ -39,11 +32,11 @@
         stdin: "{{ inputs|to_json }}"
         creates: "{{ node_systemdb_path }}"
 
-    - name: load domains
-      import_tasks: tasks/node-load-domains.yml
+    - name: load authorities
+      import_tasks: tasks/node-load-authorities.yml
 
-    - name: populate domains
-      include_tasks: "{{ domain_init_taskpath }}"
-      loop: "{{ lookup('fileglob', playbook_dir ~ '/tasks/domains-init/*.yml', wantlist=True) }}"
+    - name: populate authorities
+      include_tasks: "{{ authorities_init_taskpath }}"
+      loop: "{{ lookup('fileglob', playbook_dir ~ '/tasks/authorities-init/*.yml', wantlist=True) }}"
       loop_control:
-        loop_var: domain_init_taskpath
+        loop_var: authorities_init_taskpath

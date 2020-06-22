@@ -1,4 +1,8 @@
 #!/usr/bin/env ansible-playbook
+# Need additional flags to work this:
+# -i localhost,
+# -c local
+# -e ansible_become=false
 ---
 - hosts: localhost
   tasks:

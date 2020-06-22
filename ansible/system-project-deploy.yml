@@ -18,8 +18,8 @@
   hosts: nodes
   tasks:
 
-    - name: domains
-      import_tasks: tasks/node-load-domains.yml
+    - name: authorities
+      import_tasks: tasks/node-load-authorities.yml
 
     - name: load system project resources
       import_tasks: tasks/project-load-resources.yml
@@ -27,12 +27,12 @@
     - name: push system project resource files
       include_tasks: tasks/project-dump-resources.yml
 
-    - name: create system domain network
+    - name: create system.domain network
       docker_network:
         name: system.domain
         enable_ipv6: true
         ipam_config:
-          - subnet: "{{ domains['system']['network'] }}"
+          - subnet: "{{ authorities['system.domain']['network'] }}"
 
     - name: pull system project remote images
       when:
