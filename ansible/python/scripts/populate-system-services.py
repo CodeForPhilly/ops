@@ -14,7 +14,7 @@ if __name__ == '__main__':
     for svc in project_services:
 
         # Rewrite grid names
-        svc['groups'] = [{ 'scope': 'system', 'name': '{}.system.domain'.format(svc['name']) }]
+        svc['authorities'] = [{ 'scope': 'system', 'name': '{}.system.domain'.format(svc['name']) }]
         svc['system'] = {}
 
         # Add port bindings

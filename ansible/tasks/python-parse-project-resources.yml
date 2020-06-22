@@ -43,10 +43,10 @@
   loop_control:
     label: "{{ resource_type }}"
 
-- name: populate service grid names
-  register: svc_gridnames_job
+- name: populate service domain names
+  register: svc_domainnames_job
   changed_when: false
-  command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-service-gridnames.py"
+  command: "{{ ansible_python.executable }} {{ playbook_dir }}/python/scripts/populate-service-authorities.py"
   vars:
     inputs:
       project_name: "{{ project_name }}"
@@ -58,7 +58,7 @@
 
 - name: register service grid names
   set_fact:
-    project_resources: "{{ project_resources|combine({ 'services': svc_gridnames_job.stdout|from_json }) }}"
+    project_resources: "{{ project_resources|combine({ 'services': svc_domainnames_job.stdout|from_json }) }}"
 
 - name: parse service container build instructions
   register: svc_buildinfo_job
