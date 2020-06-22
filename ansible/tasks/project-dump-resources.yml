@@ -1,23 +1,15 @@
 ---
-- name: set default dump dir
-  when: >
-    project_records_dir is not defined or
-    project_records_dir|length == 0
-  set_fact:
-    project_records_dir: "{{ playbook_dir }}/project-records"
-
-- name: set project dump dir
-  set_fact:
-    project_dump_dir: "{{ project_records_dir }}/{{ project_name }}"
+- name: path variables
+  import_tasks: tasks/project-records-vars.yml
 
 - name: create dump dir
   file:
-    path: "{{ project_dump_dir }}"
+    path: "{{ project_records_dir }}"
     state: directory
 
 - name: dump records
   vars:
-    dump_path: "{{ project_dump_dir }}/{{ item }}.yml"
+    dump_path: "{{ project_records_dir }}/{{ item }}.yml"
   copy:
     dest: "{{ dump_path }}"
     content: |
