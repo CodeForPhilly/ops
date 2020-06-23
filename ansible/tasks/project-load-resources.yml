@@ -10,3 +10,43 @@
       services : "{{ lookup('file', hostvars.localhost.project_resources_dir ~ '/services.yml') | from_yaml }}"
       volumes  : "{{ lookup('file', hostvars.localhost.project_resources_dir ~ '/volumes.yml')  | from_yaml }}"
       routes   : "{{ lookup('file', hostvars.localhost.project_resources_dir ~ '/routes.yml')   | from_yaml }}"
+
+- name: parse volume import sources
+  register: vol_import_parse_job
+  shell: |
+    import sys, json
+    volumes = json.loads(sys.stdin.read())
+
+    for vol in volumes:
+      srcs_raw  = vol['import']['srcs']
+      srcs      = []
+
+      for src in srcs_raw:
+        src_tokens = src.split(':', 1)
+        src_name   = src_tokens[0]
+
+        if len(src_tokens) < 2:
+          # ignore invalid import sources
+          continue
+
+        if src_name in ('http', 'https'):
+          src_loc = src
+        else:
+          src_loc = src_tokens[1]
+
+        srcs.append({
+          'name': src_name,
+          'location': src_loc
+        })
+
+      vol['import']['srcs'] = srcs
+    sys.stdout.write(json.dumps(volumes))
+    sys.exit(0)
+  args:
+    executable: "{{ ansible_python.executable }}"
+    stdin: "{{ project_resources['volumes']|to_json }}"
+  changed_when: false
+
+- name: register parsed import sources
+  set_fact:
+    project_resources: "{{ project_resources|combine({ 'volumes': vol_import_parse_job.stdout|from_json }) }}"
