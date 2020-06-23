@@ -1,0 +1,36 @@
+# Inputs:
+# project_resources
+# authorities
+#
+# TBD: the 'count' parameter
+---
+- name: update service authority records
+  when: >
+    authorities[authority_name]['count'] is not defined or
+    authorities[authority_name]['count']|int != 1
+  register: svc_authorities_job
+  set_fact:
+    authorities: >-
+      {{ authorities|combine({
+        authority_name: authorities[authority_name]|default({})|combine({
+          'count': 1
+        })
+        }) }}
+  changed_when: true
+  loop: "{{ project_resources['services'] }}"
+  loop_control:
+    loop_var: svc
+    label: "{{ svc.name }}"
+  vars:
+    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+
+- name: commit service authority records
+  when: item.changed
+  include_tasks: tasks/node-commit-authority-attr.yml
+  loop: "{{ svc_authorities_job.results }}"
+  loop_control:
+    label: "{{ svc.name }}"
+  vars:
+    svc: "{{ item.svc }}"
+    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+    authority_attr: count

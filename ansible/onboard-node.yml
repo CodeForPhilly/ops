@@ -25,3 +25,4 @@
 
 - import_playbook: node-base.yml
 - import_playbook: node-base-systemdb.yml
+- import_playbook: system-project-deploy.yml

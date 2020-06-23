@@ -1,0 +1,56 @@
+# Inputs:
+# project_name
+# project_resources
+---
+- name: project volume storage
+  file:
+    path: "{{ node_volstorage_mountpoint }}/{{ project_name }}"
+    state: directory
+
+- name: volume mountpoints
+  file:
+    path: "{{ vol_mountpoint }}"
+    state: directory
+  loop: "{{ project_resources['volumes'] }}"
+  loop_control:
+    loop_var: vol
+    label: "{{ vol.name }}"
+  vars:
+    vol_mountpoint: "{{ node_volmount_path }}/{{ project_name }}/{{ vol.name }}"
+
+- name: create volumes
+  command: truncate -s {{ vol.size }} {{ vol_path }}
+  args:
+    creates: "{{ vol_path }}"
+  loop: "{{ project_resources['volumes'] }}"
+  loop_control:
+    loop_var: vol
+    label: "{{ vol.name }}"
+  vars:
+    vol_path: "{{ node_volstorage_mountpoint }}/{{ project_name }}/{{ vol.name }}"
+
+- name: format volumes
+  filesystem:
+    dev: "{{ vol_path }}"
+    fstype: xfs
+  loop: "{{ project_resources['volumes'] }}"
+  loop_control:
+    loop_var: vol
+    label: "{{ vol.name }}"
+  vars:
+    vol_path: "{{ node_volstorage_mountpoint }}/{{ project_name }}/{{ vol.name }}"
+
+- name: mount volumes
+  loop: "{{ project_resources['volumes'] }}"
+  mount:
+    src: "{{ vol_path }}"
+    path: "{{ vol_mountpoint }}"
+    state: mounted
+    fstype: xfs
+    opts: loop,nofail
+  loop_control:
+    loop_var: vol
+    label: "{{ vol.name }}"
+  vars:
+    vol_path: "{{ node_volstorage_mountpoint }}/{{ project_name }}/{{ vol.name }}"
+    vol_mountpoint: "{{ node_volmount_path }}/{{ project_name }}/{{ vol.name }}"

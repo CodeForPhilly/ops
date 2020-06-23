@@ -1,0 +1,48 @@
+
+# Inputs:
+# project_resources
+---
+- name: pull remote project images
+  when:
+    - svc.container_opts.image is defined
+    - svc.container_opts.image|length > 0
+  docker_image:
+    name: "{{ svc.container_opts.image }}"
+    source: pull
+  loop: "{{ project_resources['services'] }}"
+  loop_control:
+    label: "{{ svc.name }}"
+  vars:
+    svc: "{{ item }}"
+
+- name: fetch build context
+  when: >
+    svc.container_opts.image is not defined or
+    svc.container_opts.image|length == 0
+  include_tasks: tasks/project-fetch.yml
+  vars:
+    svc              : "{{ item }}"
+    project_repo_url : "{{ svc.container_opts.build.dockerfile_context.split('#', 1)[0]                  }}"
+    project_ref      : "{{ svc.container_opts.build.dockerfile_context.split('#', 1)[1].split(':', 1)[0] }}"
+  loop: "{{ project_resources['services'] }}"
+  loop_control:
+    label: "{{ svc.name }}"
+
+- name: build local project images
+  when: >
+    svc.container_opts.image is not defined or
+    svc.container_opts.image|length == 0
+  vars:
+    svc         : "{{ item }}"
+    ctx_subpath : "{{ svc.container_opts.build.dockerfile_context.split('#', 1)[1].split(':', 1)[1] }}"
+  docker_image:
+    name: "{{ svc.container_opts.build.image }}"
+    source: build
+    build:
+      path       : "{{ project_repo_dir }}/{{ ctx_subpath }}"
+      args       : "{{ svc.container_opts.build.dockerfile_args|default(omit) }}"
+      dockerfile : "{{ svc.container_opts.build.dockerfile_name|default(omit) }}"
+      pull       : true
+  loop: "{{ project_resources['services'] }}"
+  loop_control:
+    label: "{{ svc.name }}"
