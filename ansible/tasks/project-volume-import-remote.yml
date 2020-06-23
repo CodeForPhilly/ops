@@ -1,0 +1,14 @@
+# Inputs:
+# project_resources
+# project_name
+# vol_name
+# vol_import_src
+---
+- name: '{{ vol_name }} - import data from remote archive {{ vol_import_src.location }}'
+  unarchive:
+    remote_src: true
+    src: "{{ vol_import_src.location }}"
+    dest: "{{ vol_mountpoint }}"
+  vars:
+    vol                : "{{ project_resources['volumes']|selectattr('name', 'equalto', vol_name)|first }}"
+    vol_mountpoint     : "{{ node_volmount_path }}/{{ project_name }}/{{ vol.name }}"

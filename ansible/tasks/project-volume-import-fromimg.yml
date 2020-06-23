@@ -4,7 +4,7 @@
 # vol_name
 # vol_import_src
 ---
-- name: '{{ vol_name }} - import data from container image'
+- name: '{{ vol_name }} - import data from {{ vol_import_src.name }} container image'
   shell: |
     set -e
 
