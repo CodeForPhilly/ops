@@ -1,0 +1,26 @@
+# Inputs:
+# project_resources
+# project_name
+# vol_name
+# vol_import_src
+---
+- name: '{{ vol_name }} - import data from container image'
+  shell: |
+    set -e
+
+    if docker container inspect {{ tmp_container_name }}; then
+      docker rm -f {{ tmp_container_name }}
+    fi
+    trap 'docker rm -f {{ tmp_container_name }}' EXIT SIGINT SIGTERM SIGQUIT
+
+    docker container create --name {{ tmp_container_name }} {{ vol_import_img }}
+    docker cp {{ tmp_container_name }}:{{ vol_import_src.location }}/. {{ vol_mountpoint }}
+  vars:
+    vol                : "{{ project_resources['volumes']|selectattr('name', 'equalto', vol_name)|first }}"
+    vol_mountpoint     : "{{ node_volmount_path }}/{{ project_name }}/{{ vol.name }}"
+    tmp_container_name : "{{ vol.name }}-import"
+    vol_import_img     : >-
+      {{
+        (project_resources['services']|selectattr('name', 'equalto', vol_import_src.name)|first)['container_opts']['image']|
+        default((project_resources['services']|selectattr('name', 'equalto', vol_import_src.name)|first)['container_opts']['build']['image'])
+      }}

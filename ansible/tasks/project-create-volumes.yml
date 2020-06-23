@@ -56,32 +56,15 @@
     vol_path: "{{ node_volstorage_mountpoint }}/{{ project_name }}/{{ vol.name }}"
     vol_mountpoint: "{{ node_volmount_path }}/{{ project_name }}/{{ vol.name }}"
 
-- name: initial data imports - from container images
-  when:
-    - vol_create_job.changed
-    - vol_import_src.name not in ['http', 'https']
-  shell: |
-    set -e
-
-    if docker container inspect {{ tmp_container_name }}; then
-      docker rm -f {{ tmp_container_name }}
-    fi
-    trap 'docker rm -f {{ tmp_container_name }}' EXIT SIGINT SIGTERM SIGQUIT
-
-    docker container create --name {{ tmp_container_name }} {{ vol_import_img }}
-    docker cp {{ tmp_container_name }}:{{ vol_import_src.location }}/. {{ vol_mountpoint }}
-
+- name: initial data imports
+  when: vol_create_job.changed
+  include_tasks: tasks/project-volume-import-{{ vol_import_taskname }}.yml
   loop: "{{ lookup('subelements', vols_create_job.results, 'vol.import.srcs', wantlist=True) }}"
   loop_control:
     label: "{{ vol.name }}"
   vars:
-    vol: "{{ item[0].vol }}"
-    vol_create_job: "{{ item[0] }}"
-    vol_import_src: "{{ item[1] }}"
-    vol_mountpoint: "{{ node_volmount_path }}/{{ project_name }}/{{ vol.name }}"
-    tmp_container_name: "{{ vol.name }}-import"
-    vol_import_img: >-
-      {{
-        (project_resources['services']|selectattr('name', 'equalto', vol_import_src.name)|first)['container_opts']['image']|
-        default((project_resources['services']|selectattr('name', 'equalto', vol_import_src.name)|first)['container_opts']['build']['image'])
-      }}
+    vol_create_job      : "{{ item[0] }}"
+    vol                 : "{{ vol_create_job.vol }}"
+    vol_name            : "{{ vol.name }}"
+    vol_import_src      : "{{ item[1] }}"
+    vol_import_taskname : "{% if vol_import_src.name in ('http', 'https') %}remote{% else %}fromimg{% endif %}"
