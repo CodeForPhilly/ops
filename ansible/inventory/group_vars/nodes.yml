@@ -7,9 +7,9 @@ node_admin_venv: /home/{{ node_admin_user }}/.python
 node_admin_authorized_keys: "{{ playbook_dir }}/../resources/authorized_keys"
 
 node_volstorage_fstype: xfs
-node_volstorage_mountpoint: /mnt/volstorage
+node_volstorage_mountpoint: /mnt/data
 
-node_volmount_path: /srv/volumes
+node_volmount_path: /volumes
 node_projects_path: /projects
 
 node_systemdb_path: /var/lib/system.db
