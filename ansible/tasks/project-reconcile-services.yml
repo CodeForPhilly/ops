@@ -1,5 +1,6 @@
 # Inputs:
 # project_resources
+# project_name
 # authorities
 ---
 - name: generate desired service instances list
@@ -61,10 +62,58 @@
   vars:
     authority_name: "{{ svc_inst_get.svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
 
-- name: show desired instances
-  debug:
-    var: project_service_instances_want
+- name: scale in services
+  when: instance_name not in (project_service_instances_want|selectattr('authority', 'equalto', authority_name)|first).instances
+  docker_container:
+    name: "{{ instance_name }}"
+    state: absent
+  loop: "{{ lookup('subelements', project_service_instances_have, 'instances', wantlist=True) }}"
+  loop_control:
+    label: "{{ instance_name }}"
+  vars:
+    authority_name: "{{ item[0].authority }}"
+    instance_name: "{{ item[1] }}"
 
-- name: show running instances
-  debug:
-    var: project_service_instances_have
+- name: deploy services
+
+  docker_container:
+    name: "{{ instance_name }}"
+    image: "{{ svc_img }}"
+    state: "{{ 'started' if svc.startup else 'present' }}"
+    restart_policy: "{{ 'always' if svc.startup else omit }}"
+    networks_cli_compatible: true
+    network_mode: "{{ authority_parent }}"
+    networks:
+      - name: "{{ authority_parent }}"
+        aliases:
+          - "{{ authority_name }}"
+    volumes: "{{ svc_vols if svc_vols|length > 0 else omit }}"
+    labels:
+      civic-cloud.authority: "{{ authority_name }}"
+    ports: "{{ svc_ports if svc_ports|length > 0 else omit }}"
+
+  loop: "{{ lookup('subelements', project_service_instances_want, 'instances', wantlist=True) }}"
+  loop_control:
+    label: "{{ instance_name }}"
+  vars:
+    authority_name: "{{ item[0].authority }}"
+    authority_parent: "{{ authority_name.split('.', 1)[1] }}"
+    instance_name: "{{ item[1] }}"
+    svc: "{{ project_resources.services|selectattr('name', 'equalto', authority_name.split('.')[0])|first }}"
+    svc_img: "{{ svc.container_opts.image if svc.container_opts.image|default('')|length > 0 else svc.container_opts.build.image }}"
+    svc_vols_yaml: |
+      {% for vol in project_resources.volumes %}
+      {% for binding in vol.bindings %}
+      {% if  binding.service == svc.name %}
+      - {{ node_volmount_path ~ '/' ~ project_name ~ '/' ~ vol.name  }}:{{ binding.mountpoint }}
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
+    svc_ports_yaml: |
+      {% if svc.system is defined %}
+      {% for port in svc.system.ports|default([]) %}
+      - {{ port.node }}:{{ port.svc }}
+      {% endfor %}
+      {% endif %}
+    svc_vols: "{{ svc_vols_yaml|from_yaml }}"
+    svc_ports: "{{ svc_ports_yaml|from_yaml }}"
