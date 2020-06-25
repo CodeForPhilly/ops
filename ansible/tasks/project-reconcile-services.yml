@@ -1,0 +1,70 @@
+# Inputs:
+# project_resources
+# authorities
+---
+- name: generate desired service instances list
+  set_fact:
+    project_service_instances_want: >
+      {{
+        project_service_instances_want|default([]) +
+        [{
+          'authority': authority_name,
+          'instances': lookup(
+            'sequence',
+            'count=' ~ authorities[authority_name]['count'] ~ ' format=%0.2d.' ~ authority_name,
+            wantlist=True
+          )
+        }]
+      }}
+  loop: "{{ project_resources['services'] }}"
+  loop_control:
+    loop_var: svc
+    label: "{{ svc.name }}"
+  vars:
+    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+
+- name: get running service instances list
+  register: get_running_instances_job
+  shell: |
+    import sys, json, docker
+    d         = docker.from_env()
+    all       = d.containers.list(all=True)
+    instances = filter(lambda c: c.labels.get('civic-cloud.authority') == '{{ authority_name }}', all)
+    instnames = map(lambda c: c.name, instances)
+
+    sys.stdout.write(json.dumps(sorted(instnames)))
+    sys.exit(0)
+  args:
+    executable: "{{ ansible_python.executable }}"
+  changed_when: false
+  loop: "{{ project_resources['services'] }}"
+  loop_control:
+    loop_var: svc
+    label: "{{ svc.name }}"
+  vars:
+    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+
+- name: register running service instances list
+  set_fact:
+    project_service_instances_have: >
+      {{
+        project_service_instances_have|default([]) +
+        [{
+          'authority': authority_name,
+          'instances': svc_inst_get.stdout|from_json
+        }]
+      }}
+  loop: "{{ get_running_instances_job.results }}"
+  loop_control:
+    loop_var: svc_inst_get
+    label: "{{ svc_inst_get.svc.name }}"
+  vars:
+    authority_name: "{{ svc_inst_get.svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+
+- name: show desired instances
+  debug:
+    var: project_service_instances_want
+
+- name: show running instances
+  debug:
+    var: project_service_instances_have

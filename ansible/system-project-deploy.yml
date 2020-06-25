@@ -46,3 +46,6 @@
     - name: create volumes
       import_tasks: tasks/project-create-volumes.yml
       become: true
+
+    - name: run services
+      import_tasks: tasks/project-reconcile-services.yml
