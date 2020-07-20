@@ -1,0 +1,79 @@
+#!/usr/bin/env ansible-playbook
+---
+- import_playbook: inventory-project-instances.yml
+
+# Forcing the controller to run this play
+# allows us to use the path hostvars.localhost.project_home
+# later on to lookup project resources on the controller
+- name: Load project home paths
+  gather_facts: false
+  hosts:
+    - project_instances
+    - localhost
+  tasks:
+    - name: project path
+      import_tasks: tasks/project-local-paths.yml
+
+
+- name: Deploy projects
+  hosts: project_instances
+  tasks:
+
+    - name: authorities
+      import_tasks: tasks/node-load-authorities.yml
+
+    - name: load project resources
+      import_tasks: tasks/project-load-resources.yml
+
+    - name: push project resource files
+      include_tasks: tasks/project-dump-resources.yml
+
+    - name: create project subnet
+      when: authorities[project_authority_root]['network'] is not defined
+      include_tasks: tasks/python-gen-subnet.yml
+      vars:
+        new_subnet_supernet: "{{ authorities['node.domain']['network'] }}"
+        new_subnet_pfxlen: 80
+
+    - name: register project subnet
+      when: new_subnet is defined
+      set_fact:
+        authorities: >-
+          {{
+              authorities|
+              combine({
+                project_authority_root: authorities[project_authority_root]|default({})|
+                combine({ 'network': new_subnet })
+              })
+          }}
+
+    - name: commit project subnet
+      when: new_subnet is defined
+      include_tasks:
+        file: tasks/node-commit-authority-attr.yml
+        apply:
+          become: true
+      vars:
+        authority_name: "{{ project_authority_root }}"
+        authority_attr: network
+
+    - name: create project network
+      docker_network:
+        name: "{{ project_authority_root }}"
+        enable_ipv6: true
+        ipam_config:
+          - subnet: "{{ authorities[project_authority_root]['network'] }}"
+
+    - name: project images
+      import_tasks: tasks/project-images.yml
+
+    - name: service authority records
+      import_tasks: tasks/project-service-authorities.yml
+      become: true
+
+    - name: create volumes
+      import_tasks: tasks/project-create-volumes.yml
+      become: true
+
+    - name: run services
+      import_tasks: tasks/project-reconcile-services.yml
