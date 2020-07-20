@@ -1,15 +1,19 @@
 # Inputs:
 # hostvars.localhost.project_resources_dir
+# project_name
 #
 # Outputs:
 # project_resources
 ---
+
+# We are not using project_resources_dir here because
+# it may not be set for the controller (localhost)
 - name: load resources
   set_fact:
     project_resources:
-      services : "{{ lookup('file', hostvars.localhost.project_resources_dir ~ '/services.yml') | from_yaml }}"
-      volumes  : "{{ lookup('file', hostvars.localhost.project_resources_dir ~ '/volumes.yml')  | from_yaml }}"
-      routes   : "{{ lookup('file', hostvars.localhost.project_resources_dir ~ '/routes.yml')   | from_yaml }}"
+      services : "{{ lookup('file', hostvars.localhost.projects_home ~ '/{{ project_name }}/resources/services.yml') | from_yaml }}"
+      volumes  : "{{ lookup('file', hostvars.localhost.projects_home ~ '/{{ project_name }}/resources/volumes.yml')  | from_yaml }}"
+      routes   : "{{ lookup('file', hostvars.localhost.projects_home ~ '/{{ project_name }}/resources/routes.yml')   | from_yaml }}"
 
 - name: parse volume import sources
   register: vol_import_parse_job
