@@ -4,79 +4,22 @@
   hosts: localhost
   tasks:
 
-    - name: project paths
-      import_tasks: tasks/project-local-paths.yml
-
-    - name: load service resource records
-      register: load_svcs_job
-      vars:
-        records_load_dir: "{{ projects_home }}/{{ item }}/resources"
-      set_fact:
-        project_services: >-
-          {{
-            project_services|default({})|
-            combine({
-              item: lookup('file', records_load_dir ~ '/services.yml')|from_yaml
-            })
-          }}
-      loop: "{{ groups['projects'] }}"
-
-    - name: load volume resource records
-      register: load_vols_job
-      vars:
-        records_load_dir: "{{ projects_home }}/{{ item }}/resources"
-      set_fact:
-        project_volumes: >-
-          {{
-            project_volumes|default({})|
-            combine({
-              item: lookup('file', records_load_dir ~ '/volumes.yml')|from_yaml
-            })
-          }}
-      loop: "{{ groups['projects'] }}"
-
-    - name: load route resource records
-      register: load_routes_job
-      vars:
-        records_load_dir: "{{ projects_home }}/{{ item }}/resources"
-      set_fact:
-        project_routes: >-
-          {{
-            project_routes|default({})|
-            combine({
-              item: lookup('file', records_load_dir ~ '/routes.yml')|from_yaml
-            })
-          }}
-      loop: "{{ groups['projects'] }}"
-
-    - name: get project placement lists
-      when: hostvars[item]['project_placement'] is defined
-      set_fact:
-        project_placements: >-
-          {{
-              (project_placements|default([])) + [
-                { 'project': item, 'placement': hostvars[item]['project_placement'] }
-              ]
-          }}
-      loop: "{{ groups['projects'] }}"
-
     - name: generate project instances inventory group
       vars:
-        project_name: "{{ item[0].project }}"
-        placement_host: "{{ item[1].host }}"
-        svc_counts: "{{ item[1].svc_counts }}"
-        project_instance: "{{ project_name }}.{{ placement_host }}"
+        project_name: "{{ item[0].inventory_hostname }}"
+        placement_node: "{{ item[1].node }}"
+        instance_name: "{{ project_name }}.{{ placement_node }}"
       add_host:
-        name: "{{ project_instance }}"
+        name: "{{ instance_name }}"
         groups:
           - project_instances
-        ansible_host: "{{ hostvars[placement_host]['ansible_host']|default(placement_host) }}"
-        project_services: "{{ project_services[project_name] }}"
-        project_volumes: "{{ project_volumes[project_name] }}"
-        project_routes: "{{ project_routes[project_name] }}"
-        project_svc_counts: "{{ svc_counts }}"
+        ansible_host: "{{ hostvars[placement_node]['ansible_host']|default(placement_node) }}"
+        ansible_user: "{{ node_admin_user }}"
+        project_name: "{{ project_name }}"
+        project_instance_svc_counts: "{{ item[1].svc_counts }}"
+        project_instance_placement: "{{ item[1].node }}"
 
-      loop: "{{ lookup('subelements', project_placements, 'placement', wantlist=True) }}"
+      loop: "{{ groups['projects']|map('extract', hostvars)|list|subelements('project_placement') }}"
       loop_control:
-        label: "{{ project_instance }}"
+        label: "{{ instance_name }}"
       changed_when: false
