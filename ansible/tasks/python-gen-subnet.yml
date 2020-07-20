@@ -15,7 +15,7 @@
       subnet_pfxlen: "{{ new_subnet_pfxlen }}"
   args:
     stdin: "{{ inputs|to_json }}"
-    executable: "{{ ansible_python.executable }}"
+    executable: "{{ ansible_playbook_python }}"
   changed_when: false
   delegate_to: localhost
   become: false

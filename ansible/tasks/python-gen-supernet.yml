@@ -13,8 +13,10 @@
       pfxlen: "{{ new_supernet_pfxlen }}"
   args:
     stdin: "{{ inputs|to_json }}"
-    executable: "{{ ansible_python.executable }}"
+    executable: "{{ ansible_playbook_python }}"
   changed_when: false
+  delegate_to: localhost
+  become: false
 
 - name: register generated supernet
   set_fact:
