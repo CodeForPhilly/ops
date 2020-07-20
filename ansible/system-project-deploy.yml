@@ -18,6 +18,8 @@
   hosts: nodes
   vars:
     project_name: system
+    project_authority_scope: system
+    project_authority_root: system.domain
   tasks:
 
     - name: authorities
@@ -31,10 +33,10 @@
 
     - name: create system.domain network
       docker_network:
-        name: system.domain
+        name: "{{ project_authority_root }}"
         enable_ipv6: true
         ipam_config:
-          - subnet: "{{ authorities['system.domain']['network'] }}"
+          - subnet: "{{ authorities[project_authority_root]['network'] }}"
 
     - name: system project images
       import_tasks: tasks/project-images.yml

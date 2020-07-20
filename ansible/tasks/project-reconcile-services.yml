@@ -22,7 +22,7 @@
     loop_var: svc
     label: "{{ svc.name }}"
   vars:
-    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', project_authority_scope)|map(attribute='name')|first }}"
 
 - name: get running service instances list
   register: get_running_instances_job
@@ -43,7 +43,7 @@
     loop_var: svc
     label: "{{ svc.name }}"
   vars:
-    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', project_authority_scope)|map(attribute='name')|first }}"
 
 - name: register running service instances list
   set_fact:
@@ -60,7 +60,7 @@
     loop_var: svc_inst_get
     label: "{{ svc_inst_get.svc.name }}"
   vars:
-    authority_name: "{{ svc_inst_get.svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+    authority_name: "{{ svc_inst_get.svc.authorities|selectattr('scope', 'equalto', project_authority_scope)|map(attribute='name')|first }}"
 
 - name: scale in services
   when: instance_name not in (project_service_instances_want|selectattr('authority', 'equalto', authority_name)|first).instances

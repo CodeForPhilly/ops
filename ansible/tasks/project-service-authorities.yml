@@ -22,7 +22,7 @@
     loop_var: svc
     label: "{{ svc.name }}"
   vars:
-    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', project_authority_scope)|map(attribute='name')|first }}"
 
 - name: commit service authority records
   when: item.changed
@@ -32,5 +32,5 @@
     label: "{{ svc.name }}"
   vars:
     svc: "{{ item.svc }}"
-    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', 'system')|map(attribute='name')|first }}"
+    authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', project_authority_scope)|map(attribute='name')|first }}"
     authority_attr: count
