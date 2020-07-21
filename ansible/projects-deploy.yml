@@ -28,7 +28,7 @@
     - name: push project resource files
       include_tasks: tasks/project-dump-resources.yml
 
-    - name: create project subnet
+    - name: generate project subnet
       when: authorities[project_authority_root]['network'] is not defined
       include_tasks: tasks/python-gen-subnet.yml
       vars:
