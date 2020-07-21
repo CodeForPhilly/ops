@@ -16,7 +16,7 @@
         ansible_host: "{{ hostvars[placement_node]['ansible_host']|default(placement_node) }}"
         ansible_user: "{{ node_admin_user }}"
         project_name: "{{ project_name }}"
-        project_instance_svc_counts: "{{ item[1].svc_counts }}"
+        project_instance_svc_counts: "{{ item[1].svc_counts|default({}) }}"
         project_instance_placement: "{{ item[1].node }}"
         project_authority_scope: node
         project_authority_root: '{{ project_name }}.node.domain'
