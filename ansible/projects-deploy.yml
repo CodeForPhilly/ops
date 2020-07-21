@@ -77,3 +77,7 @@
 
     - name: run services
       import_tasks: tasks/project-reconcile-services.yml
+
+    - name: bind routes
+      import_tasks: tasks/project-service-routes.yml
+      become: true

@@ -1,0 +1,105 @@
+# Inputs:
+# project_resources
+# project_authority_scope
+# project_authority_root
+---
+- name: route binding configs
+  vars:
+    cfg_dir: "{{ node_volmount_path }}/system/router-config/"
+    backends_dir: "{{ cfg_dir }}/backends"
+    frontend_cfg: "{{ cfg_dir }}/frontend.cfg"
+    exposed_svc_names: "{{ project_resources.routes|map(attribute='binding.target')|unique|list }}"
+  block:
+
+    - name: expose service ports
+      vars:
+        svc_authority_name: "{{ svc.authorities|selectattr('scope', 'equalto', project_authority_scope)|map(attribute='name')|first }}"
+        svc_cfg: "{{ svc_authority_name.split('.')|reverse|join('.') }}.cfg"
+        svc_routes: "{{ project_resources.routes|selectattr('binding.target', 'equalto', svc.name)|list }}"
+      template:
+        src: templates/http-router/backend.cfg
+        dest: "{{ backends_dir }}/{{ svc_cfg }}"
+      loop: "{{ project_resources.services|selectattr('name', 'in', exposed_svc_names)|list }}"
+      loop_control:
+        loop_var: svc
+        label: "{{ svc.name }}"
+      register: svc_ports_job
+
+    - name: bind route hostnames
+      vars:
+        cfg_line_pfx: "        acl {{ project_authority_root }}_route_{{ i }}_host "
+      lineinfile:
+        path: "{{ frontend_cfg }}"
+        regexp: "^{{ cfg_line_pfx|regex_escape }}"
+        line: "{{ cfg_line_pfx }} hdr(host) -i {{ route.host }}"
+        insertbefore: '^\s*use_backend'
+        firstmatch: true
+      loop: "{{ project_resources.routes }}"
+      loop_control:
+        loop_var: route
+        index_var: i
+        label: "{{ route.host ~ route.path }}"
+      register: route_hostnames_job
+
+    - name: bind route paths
+      vars:
+        cfg_line_pfx: "        acl {{ project_authority_root }}_route_{{ i }}_path "
+      lineinfile:
+        path: "{{ frontend_cfg }}"
+        regexp: "^{{ cfg_line_pfx|regex_escape }}"
+        line: "{{ cfg_line_pfx }} path_beg -i {{ route.path }}"
+        insertbefore: '^\s*use_backend'
+        firstmatch: true
+      loop: "{{ project_resources.routes }}"
+      loop_control:
+        loop_var: route
+        index_var: i
+        label: "{{ route.host ~ route.path }}"
+      register: route_paths_job
+
+    - name: bind route targets
+      vars:
+        tgt_svc: "{{ project_resources.services|selectattr('name', 'equalto', route.binding.target)|first }}"
+        tgt_authority: "{{ tgt_svc.authorities|selectattr('scope', 'equalto', project_authority_scope)|map(attribute='name')|first }}"
+        tgt_port: "{{ route.binding.port }}"
+        cfg_line_pfx: "        use_backend {{ tgt_authority }}_{{ tgt_port }} "
+      lineinfile:
+        path: "{{ frontend_cfg }}"
+        regexp: "^{{ cfg_line_pfx|regex_escape }}"
+        line: "{{ cfg_line_pfx }} if {{ project_authority_root }}_route_{{ i }}_host {{ project_authority_root }}_route_{{ i }}_path"
+        insertafter: '^\s*use_backend'
+      loop: "{{ project_resources.routes }}"
+      loop_control:
+        loop_var: route
+        index_var: i
+        label: "{{ route.host ~ route.path }}"
+      register: route_targets_job
+
+- name: router instance mgmt
+  vars:
+    rtr_authority: http-router.system.domain
+    rtr_instances: >
+      {{ lookup(
+        'sequence',
+        'count=' ~ authorities[rtr_authority]['count'] ~ ' format=%0.2d.' ~ rtr_authority,
+        wantlist=True
+      ) }}
+  block:
+
+    - name: expose project network to routers
+      when: project_resources.routes|length > 0
+      docker_container:
+        name: "{{ item }}"
+        networks:
+          - name: "{{ project_authority_root }}"
+        networks_cli_compatible: true
+      loop: "{{ rtr_instances }}"
+
+    - name: reload routers
+      when: >
+        svc_ports_job.changed        or
+        route_hostnames_job.changed  or
+        route_paths_job.changed      or
+        route_targets_job.changed
+      command: docker kill -s SIGUSR2 {{ item }}
+      loop: "{{ rtr_instances }}"
