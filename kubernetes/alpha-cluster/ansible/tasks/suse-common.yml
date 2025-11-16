@@ -1,3 +1,0 @@
----
-- name: install 'man'
-  package: name=man state=present

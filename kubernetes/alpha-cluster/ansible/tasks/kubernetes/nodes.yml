@@ -1,3 +1,0 @@
----
-- name: docker config file
-  copy: src=../sysconfig-docker dest=/etc/sysconfig/docker mode=0644
