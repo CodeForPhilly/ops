@@ -18,16 +18,19 @@ resource "google_dns_record_set" "live_k8s_host" {
 
 # Catch-all for every *.live.k8s.phl.io name without a specific record above.
 #
-# Deliberately still pointed at nginx: flipping this in one shot would move
-# every hostname simultaneously, including any whose Gateway isn't ready — the
-# failure mode the sandbox migration hit. Once every host in live_k8s_hosts is
-# on "envoy", repoint this to envoy and delete the per-host records.
+# Now on Envoy. Every app in the cluster has a Gateway + HTTPRoute, so there is
+# nothing left for this to strand — the reason it was held back is gone.
+#
+# The per-host records in live_k8s_host are now redundant (they resolve to the
+# same IP this does) and are removed in a follow-up, separately: destroying them
+# in the same apply that flips this record risks a destroy landing first and
+# dropping that host onto nginx for a few seconds.
 resource "google_dns_record_set" "live_k8s_wildcard" {
   managed_zone = local.phl_io_zone
   name         = "*.live.k8s.phl.io."
   type         = "A"
   ttl          = 300
-  rrdatas      = [local.lb["nginx"]]
+  rrdatas      = [local.lb["envoy"]]
 }
 
 # Service names that resolve into the cluster via the records above. Pointing
