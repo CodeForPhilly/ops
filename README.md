@@ -8,3 +8,7 @@ You can create an issue to...
 * [deploy a new application](https://github.com/CodeForPhilly/ops/issues/new?assignees=&labels=&template=new-application-deployment.md&title=Deploy+%5BAPP%5D)
 * [create a new Code for Philly github repo](https://github.com/CodeForPhilly/ops/issues/new?assignees=&labels=repository&template=repository.md&title=Repo+for+%5BPROJECT%5D)
 
+## Infrastructure as code
+
+[`tofu/`](./tofu) holds the OpenTofu stacks for Code for Philly infrastructure —
+currently Cloud DNS. Applies are human-run; see [`tofu/README.md`](./tofu/README.md).
