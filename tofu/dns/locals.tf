@@ -29,10 +29,11 @@ locals {
     "penn-chime"           = "envoy"
     "sealed-secrets"       = "envoy"
     "choose-native-plants" = "envoy"
+    "third-places"         = "envoy"
 
-    # Still on nginx. Their certs are valid but CANNOT renew — cut over before
-    # they expire, or these hosts go dark.
-    "third-places"       = "nginx" # cert expires 2026-07-22
-    "browserless-chrome" = "nginx" # cert expires 2026-08-07
+    # Being deleted from the cluster entirely (Deployment is already 0/0) —
+    # see CodeForPhilly/cfp-live-cluster#162. Pinned to nginx so the wildcard's
+    # move to Envoy doesn't bother issuing it a cert on the way out.
+    "browserless-chrome" = "nginx"
   }
 }
