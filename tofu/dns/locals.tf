@@ -12,15 +12,18 @@ locals {
     nginx = "104.237.148.175"
   }
 
-  # Which load balancer each *.live.k8s.phl.io hostname resolves to.
+  # Per-host A records overriding the *.live.k8s.phl.io wildcard.
   #
-  # Each entry is a specific A record that overrides the *.live.k8s.phl.io
-  # wildcard for that one name. Flipping a host from "nginx" to "envoy" here IS
-  # the phase-4 DNS cutover for that host: apply, and cert-manager issues its
-  # Gateway cert within a few minutes.
+  # These exist only to peel hostnames off nginx one at a time while the
+  # wildcard stayed put. The wildcard now points at Envoy, so every entry here
+  # resolves to the same IP it would without a record — they are vestigial, and
+  # are removed in a follow-up once the wildcard flip is confirmed live.
   #
-  # Before flipping one, confirm the app's Gateway + HTTPRoute exist in
-  # cfp-live-cluster and that the ACME solver already answers through Envoy.
+  # A host absent from this map simply follows the wildcard. That is why
+  # third-places and browserless-chrome are NOT listed: the wildcard cuts them
+  # over for free, and inventing a record just to delete it later is churn.
+  #
+  # Do not add to this map. A new host needs no record.
   live_k8s_hosts = {
     "echo-http"            = "envoy"
     "metrics"              = "envoy"
@@ -29,11 +32,5 @@ locals {
     "penn-chime"           = "envoy"
     "sealed-secrets"       = "envoy"
     "choose-native-plants" = "envoy"
-    "third-places"         = "envoy"
-
-    # Being deleted from the cluster entirely (Deployment is already 0/0) —
-    # see CodeForPhilly/cfp-live-cluster#162. Pinned to nginx so the wildcard's
-    # move to Envoy doesn't bother issuing it a cert on the way out.
-    "browserless-chrome" = "nginx"
   }
 }
