@@ -59,3 +59,23 @@ resource "google_dns_record_set" "penn_chime" {
   ttl          = 10
   rrdatas      = ["penn-chime.live.k8s.phl.io."]
 }
+
+# ── cfp-sandbox-cluster ──────────────────────────────────────────────────────
+# The sandbox cluster's Envoy LB and its wildcard. Unlike live's *.live.k8s
+# per-host records (a migration artifact), sandbox has always used a plain
+# wildcard → LB, so there's nothing per-host to manage here.
+resource "google_dns_record_set" "sandbox_k8s" {
+  managed_zone = local.phl_io_zone
+  name         = "sandbox.k8s.phl.io."
+  type         = "A"
+  ttl          = 300
+  rrdatas      = ["139.144.241.4"] # sandbox Envoy LB
+}
+
+resource "google_dns_record_set" "sandbox_k8s_wildcard" {
+  managed_zone = local.phl_io_zone
+  name         = "*.sandbox.k8s.phl.io."
+  type         = "CNAME"
+  ttl          = 300
+  rrdatas      = ["sandbox.k8s.phl.io."]
+}
