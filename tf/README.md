@@ -1,4 +1,4 @@
-# tofu
+# tf
 
 Code for Philly infrastructure managed with [OpenTofu](https://opentofu.org).
 
@@ -35,7 +35,7 @@ Applies are human-run. There is no CI apply, by design — nobody wants a DNS ch
 landing because a workflow re-ran.
 
 ```bash
-cd tofu/<stack>
+cd tf/<stack>
 tofu init
 tofu plan -concise      # always read this
 tofu apply -concise
