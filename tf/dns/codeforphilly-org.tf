@@ -50,14 +50,3 @@ resource "google_dns_record_set" "codeforphilly_next_v2" {
   rrdatas      = ["sandbox.k8s.phl.io."]
 }
 
-# One-shot adoption of the pre-existing records. Safe to delete after the
-# first apply that includes them.
-import {
-  to = google_dns_record_set.codeforphilly_next
-  id = "openphl-1177/codeforphilly/next.codeforphilly.org./CNAME"
-}
-
-import {
-  to = google_dns_record_set.codeforphilly_next_v2
-  id = "openphl-1177/codeforphilly/next-v2.codeforphilly.org./CNAME"
-}
