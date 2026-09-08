@@ -10,5 +10,5 @@ You can create an issue to...
 
 ## Infrastructure as code
 
-[`tofu/`](./tofu) holds the OpenTofu stacks for Code for Philly infrastructure —
-currently Cloud DNS. Applies are human-run; see [`tofu/README.md`](./tofu/README.md).
+[`tf/`](./tf) holds the OpenTofu stacks for Code for Philly infrastructure —
+currently Cloud DNS. Applies are human-run; see [`tf/README.md`](./tf/README.md).
