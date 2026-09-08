@@ -23,3 +23,41 @@ resource "google_dns_record_set" "codeforphilly_wildcard" {
   ttl          = 300
   rrdatas      = ["codeforphilly.org."]
 }
+
+# Explicit subdomains that override the wildcard. Both existed in the zone
+# before this stack managed them; the import blocks below adopt them.
+
+# next.codeforphilly.org — pre-cutover home of the codeforphilly.org rewrite
+# (cfp-live-cluster, namespace codeforphilly-ng). CNAME to the apex so it
+# reaches the live Envoy gateway and follows the apex, like the wildcard.
+# Previously a CNAME to codeforphilly.github.io.
+resource "google_dns_record_set" "codeforphilly_next" {
+  managed_zone = local.codeforphilly_zone
+  name         = "next.codeforphilly.org."
+  type         = "CNAME"
+  ttl          = 300
+  rrdatas      = ["codeforphilly.org."]
+}
+
+# next-v2.codeforphilly.org — the rewrite's sandbox deployment
+# (cfp-sandbox-cluster). Unchanged; adopted so every explicit record in the
+# zone is managed here.
+resource "google_dns_record_set" "codeforphilly_next_v2" {
+  managed_zone = local.codeforphilly_zone
+  name         = "next-v2.codeforphilly.org."
+  type         = "CNAME"
+  ttl          = 300
+  rrdatas      = ["sandbox.k8s.phl.io."]
+}
+
+# One-shot adoption of the pre-existing records. Safe to delete after the
+# first apply that includes them.
+import {
+  to = google_dns_record_set.codeforphilly_next
+  id = "openphl-1177/codeforphilly/next.codeforphilly.org./CNAME"
+}
+
+import {
+  to = google_dns_record_set.codeforphilly_next_v2
+  id = "openphl-1177/codeforphilly/next-v2.codeforphilly.org./CNAME"
+}
